@@ -17,12 +17,22 @@ from django.contrib import admin
 from profiles import views as profiles_views
 from cafes import views as cafes_views
 from comments import views as comments_views
+#from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),   
-    url(r'^$', profiles_views.home, name='home'),
+    url(r'^$', profiles_views.IndexView.as_view(), name='home'),
+    url(r'^api/v1/profiles/create$', profiles_views.create_profile), 	
+   	#url(r'^api/v1/comments/create$', comments_views.create_comment, name='comment-add'), 	
+    url(r'^api/v1/comments/(\d+)/retrieve$', comments_views.retrieve_profile, name='detail'),
+
+     # /music/album/add
+    url(r'^api/v1/comments/create$', comments_views.CommentCreate.as_view(), name='comment-add'),
+
+   	url(r'^api/v1/profiles/(\d+)/retrieve$', profiles_views.retrieve_profile, name='user'), 	
+   	#url(r'^api/v1/profiles/(\d+)/update$', profiles_views.update_profile), 
     url(r'^meal/$', cafes_views.meal, name='meal'),     
-    url(r'^comment/$', comments_views.comment, name='comment'),     
+    url(r'^comment/$', comments_views.IndexView.as_view(), name='comment'),     
 
 
 ]

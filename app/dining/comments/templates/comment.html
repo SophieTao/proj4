@@ -1,1 +1,19 @@
-first comment
+{% extends 'base.html' %}
+{% block body %}
+
+<!-- <div class='row'>
+<div class='col-sm-6 col-sm-offset-3'>
+{{ form.as_p }}
+
+<form method="POST" action=''> {% csrf_token %}
+<input type='submit' value='submit form' class ='btn btn-default' />
+</form>
+
+</div>
+</div> -->
+<ul>
+	{% for comment in all_comments %}
+	<li><a href="{% url 'detail' comment.id %}">{{comment.description}}</a></li>
+			{% endfor %}
+</ul>
+{% endblock %}
