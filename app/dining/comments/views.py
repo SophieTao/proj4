@@ -2,16 +2,15 @@ from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from .models import Comment 
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponseRedirect
 from comments import models
 from django.core import serializers
 from .forms import commentForm
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
 
 class IndexView(generic.ListView):
 		model = Comment
-		template_name = 'commentt.html'
+		template_name = 'comment.html'
 		context_object_name = 'all_comments'
 
 		def get_queryset(self):
@@ -24,15 +23,15 @@ class DetailView(generic.DetailView):
 class CommentCreate(generic.CreateView):
 	model = Comment  
 	success_url = reverse_lazy('comment_list')
-	fields = ['description']
-	#fields = ['description','feedback','author','date_written','rating','meal'] #fields from model.py
+	fields = ['description','feedback','author','date_written','rating','meal'] #fields from model.py
 
-class CommentDelete(DeleteView):
+class CommentDelete(generic.DeleteView):
     model = Comment
     success_url = reverse_lazy('comment_list')
 
-class CommentUpdate(UpdateView):
+class CommentUpdate(generic.UpdateView):
 		model = Comment
+		success_url = reverse_lazy('comment_list')
 		fields = ['description','feedback','author','date_written','rating','meal'] #fields from model.py
 
 def retrieve_comment(request, comment_id):

@@ -1,5 +1,4 @@
 from django.db import models
-# from django.conf import settings
 from django.core.urlresolvers import reverse
 from profiles import models as profile_models
 from cafes import models as cafe_models
@@ -12,10 +11,10 @@ class Comment(models.Model):
 	author = models.ForeignKey(profile_models.Profile, null=True)
 	date_written = models.DateTimeField(null=True)
 	rating = models.PositiveIntegerField(null=True,validators=[MinValueValidator(1), MaxValueValidator(5),])
-	meal = models.ForeignKey(cafe_models.cafe, null=True)
+	meal = models.ForeignKey(cafe_models.Cafe, null=True)
 
 	def __str__(self):
 		return self.description
 
 	def get_absolute_url(self):
-		return reverse('detail', kwargs={'pk': self.pk})
+		return reverse('comment-update', kwargs={'pk': self.pk})

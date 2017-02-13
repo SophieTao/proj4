@@ -1,10 +1,10 @@
 from django.contrib import admin
-from .models import cafe
+from .models import Cafe
 
-class cafeAdmin(admin.ModelAdmin):
+class CafeAdmin(admin.ModelAdmin):
 	class Meta:
-		model=cafe
+		model=Cafe
 
-admin.site.register(cafe, cafeAdmin)	
+admin.site.register(Cafe, CafeAdmin)	
 
 
