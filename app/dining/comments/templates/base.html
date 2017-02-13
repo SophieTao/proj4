@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Viberr{% endblock %}</title>
+    <title>{% block title %}Cav Dining{% endblock %}</title>
     {% load staticfiles %}
     <link rel="shortcut icon" type="image/png" href="{%  static 'favicon.ico' %}"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -38,8 +38,8 @@
 
         <ul class="nav navbar-nav navbar-right">
             <li class="">
-                <a href="{% url 'comment-add' %}">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Add Comment
+                <a href="{% url 'comment_form' %}">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp; Add A Comment
                 </a>
             </li>
 
