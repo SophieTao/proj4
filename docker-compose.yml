@@ -6,4 +6,5 @@ models:
       - "$PWD/app:/app"
     ports:
       - "8001:8000"
+    command: bash -c "python /app/dining/manage.py loaddata /app/dining/db.json"  
     command: bash -c "mod_wsgi-express start-server --working-directory /app/dining --reload-on-changes /app/dining/dining/wsgi.py"
