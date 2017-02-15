@@ -38,5 +38,5 @@ def retrieve_comment(request, comment_id):
     if request.method != 'GET':
         return JsonResponse(request, "Must make GET request.",safe=False)
     c = Comment.objects.get(pk=comment_id)
-    return JsonResponse({'description': c.description,'feedback':c.feedback,'author':c.author,'date_written':c.date_written,'rating':c.rating,'meal':c.meal},safe=False)
+    return JsonResponse({'description': c.description,'feedback':c.feedback,'date_written':c.date_written,'rating':c.rating})
 
