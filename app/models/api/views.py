@@ -15,10 +15,6 @@ class IndexView(generic.ListView):
 		def get_queryset(self):
 				return Cafe.objects.all()
 
-class DetailView(generic.DetailView):
-		model = Cafe			
-		template_name	= 'detail.html'
-
 class CafeCreate(generic.CreateView):
 	model = Cafe  
 	success_url = reverse_lazy('cafe_list')
@@ -46,10 +42,6 @@ class CommentIndexView(generic.ListView):
 
 		def get_queryset(self):
 				return Comment.objects.all()
-
-class CommentDetailView(generic.DetailView):
-		model = Comment			
-		template_name	= 'detail.html'
 
 class CommentCreate(generic.CreateView):
 	model = Comment  

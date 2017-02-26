@@ -2,7 +2,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^meals$', views.IndexView.as_view(),name='cafe_list'),
+    url(r'^meals/$', views.IndexView.as_view(),name='cafe_list'),
     url(r'^meals/(\d+)$', views.retrieve_cafe, name='meal_detail'),
     url(r'^meals/(?P<pk>\d+)/edit$', views.CafeUpdate.as_view(), name='cafe-update'),
     url(r'^meals/create$', views.CafeCreate.as_view(), name='cafe-add'),
