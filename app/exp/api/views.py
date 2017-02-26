@@ -5,10 +5,9 @@ import urllib.request
 import urllib.parse
 import json
 
-
-# ITEMS
 def home(request):
-	req = urllib.request.Request('http://models-api:8000/api/v1/meals/2')
+	#req = urllib.request.Request('http://models-api:8000/api/v1/meals/2')
+	req = urllib.request.Request('http://models-api:8000/api/v1/allmeals')	
 	resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 	resp = json.loads(resp_json)
 	return JsonResponse([resp],safe=False)

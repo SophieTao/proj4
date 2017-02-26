@@ -35,6 +35,15 @@ def retrieve_cafe(request, comment_id):
     c = Cafe.objects.get(pk=comment_id)
     return JsonResponse({'name': c.name,'location':c.location,'date':c.date,'description':c.description,'Calories':c.Calories})
 
+def retrieve_cafe_all(request):
+		if request.method != 'GET':
+			return JsonResponse(request, "Must make GET request.",safe=False) 
+		meals = Cafe.objects.all()
+		response = []
+		for meal in meals:
+			response.append({"name": meal.name,"location": meal.location,"date": meal.date,"description": meal.description,"Calories": meal.Calories,})
+		return JsonResponse({"data": response})
+
 class CommentIndexView(generic.ListView):
 		model = Comment
 		template_name = 'comment.html'

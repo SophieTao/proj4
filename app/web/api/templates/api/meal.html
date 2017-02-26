@@ -3,11 +3,15 @@
 {% if meals_list %}
     <ul>
     {% for meal in meals_list %}
-        <li>{{ meal.location }}</li>
-        <li>{{ meal.name }}</li>
+    <h2>Meal Detail</h2>
+    		<br>Name: {{ meal.name }}
+        <br>Location: {{ meal.location }}
+        <br>Date: {{ meal.date }}
+        <br>Description: {{ meal.description }}
+        <br>Calories:{{ meal.Calories }}
     {% endfor %}
     </ul>
 {% else %}
-    <p>No users are available.</p>
+    <p>No such meal.</p>
     {%endif%}
-{% endblock %}
+{% endblock %}    

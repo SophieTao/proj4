@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 {% block body %}
 {% if profiles_list %}
-    <ul>
-    {% for user in profiles_list %}
-        <li>{{ user.name }}</li>
-    {% endfor %}
+View All Meals
+<br>
+<br>
+    <!--{% for user in profiles_list %}-->
+        <li>{{ profiles_list }}</li>
+    <!--{% endfor %}-->
     </ul>
 {% else %}
     <p>No users are available.</p>
