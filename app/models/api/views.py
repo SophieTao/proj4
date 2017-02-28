@@ -1,39 +1,172 @@
+from django.views.generic import View
 from django.views import generic 
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.core.urlresolvers import reverse_lazy
-from .models import Cafe, Comment, Profile
+from django.core.exceptions import ObjectDoesNotExist
+from .models import *
+from django.forms.models import model_to_dict
 from api import models
-from django.http import JsonResponse,HttpResponseRedirect
+from json import dumps
+from django.http import JsonResponse, HttpResponseRedirect
 from django.core import serializers
 from django.shortcuts import render, redirect
+from .forms import *
 
-class IndexView(generic.ListView):
-		model = Cafe
-		template_name = 'cafe_list.html'
-		context_object_name = 'all_cafes'
+'''
+Cafe (create, edit, delete, retrieve, IndexView)
+'''
 
-		def get_queryset(self):
-				return Cafe.objects.all()
+def indexView(request):
+	result = {}
+	try:
+		result["ok"] = True
+		result["result"] = [model_to_dict(cafe) for cafe in Cafe.objects.all()]
+	except Exception:
+		result["ok"] = False
+		result["result"] = []
+	return JsonResponse(result)
 
-class CafeCreate(generic.CreateView):
-	model = Cafe  
-	success_url = reverse_lazy('cafe_list')
-	fields = ['name','location','date','description','Calories'] #fields from model.py
+def create_cafe(request):
+	result = {}
+	result_msg = None
+	try:
+		req_input = {
+		'name': request.POST['name'],
+		'location':request.POST['location'],
+		'date':request.POST['date'],
+		'description':request.POST['description'],
+		'Calories':request.POST['Calories'],
+		}
+	except KeyError:
+		req_input = {}
+		result_msg = "Input did not contain all the required fields."
+	form = CafeForm(req_input)
+	if form.is_valid():
+		cafe = form.save()
+		result["ok"] = True
+		result["result"] = {"id": cafe.id}
+		return JsonResponse(result)
+	else:
+		return JsonResponse(result_msg,safe=False)
 
-class CafeDelete(generic.DeleteView):
-    model = Cafe
-    success_url = reverse_lazy('cafe_list')
+def delete_cafe(request, pk):
+	resp = {}
+	cafefound = True
+	try:
+		cafe = Cafe.objects.get(pk=pk)
+		cafe.delete()
+	except ObjectDoesNotExist:
+		cafefound = False
+		return JsonResponse("This meal does not exist.",safe=False)
+	if cafefound:
+		return JsonResponse("Deleted meal", safe=False)
 
-class CafeUpdate(generic.UpdateView):
-		model = Cafe
-		success_url = reverse_lazy('cafe_list')
-		fields = ['name','location','date','description','Calories'] #fields from model.py
 
-def retrieve_cafe(request, comment_id):
-    if request.method != 'GET':
+
+
+'''
+Comment (create, delete, commentView)
+'''
+
+
+def commentView(request):
+	result = {}
+	try:
+		result["ok"] = True
+		result["result"] = [model_to_dict(comment) for comment in Comment.objects.all()]
+	except Exception:
+		result["ok"] = False
+		result["result"] = []
+	return JsonResponse(result)
+
+
+def create_comment(request):
+	result = {}
+	result_msg = None
+	try:
+		req_input = {
+		'description': request.POST['description'],
+		'feedback':request.POST['feedback'],
+		'date_written':request.POST['date_written'],
+		'rating':request.POST['rating'],
+		}
+	except KeyError:
+		req_input = {}
+		result_msg = "Input did not contain all the required fields."
+	form = CommentForm(req_input)
+	if form.is_valid():
+		comment = form.save()
+		result["ok"] = True
+		result["result"] = {"id": comment.id}
+		return JsonResponse(result)
+	else:
+		return JsonResponse(result_msg,safe=False)
+
+def delete_comment(request, pk):
+	resp = {}
+	commentfound = True
+	try:
+		comment = Comment.objects.get(pk=pk)
+		comment.delete()
+	except ObjectDoesNotExist:
+		commentfound = False
+		return JsonResponse("This comment does not exist.",safe=False)
+	if commentfound:
+		return JsonResponse("Deleted comment", safe=False)
+
+
+'''
+Profile (create, retrieve, IndexView)
+'''
+
+def profileView(request):
+	result = {}
+	try:
+		result["ok"] = True
+		result["result"] = [model_to_dict(profile) for profile in Profile.objects.all()]
+	except Exception:
+		result["ok"] = False
+		result["result"] = []
+	return JsonResponse(result)
+
+def create_profile(request):
+	result = {}
+	result_msg = None
+	try:
+		req_input = {
+		'name': request.POST['name'],
+		}
+	except KeyError:
+		req_input = {}
+		result_msg = "Input did not contain all the required fields."
+	form = ProfileForm(req_input)
+	if form.is_valid():
+		profile = form.save()
+		result["ok"] = True
+		result["result"] = {"id": profile.id}
+		return JsonResponse(result)
+	else:
+		return JsonResponse(result_msg,safe=False)
+
+def delete_profile(request, pk):
+	resp = {}
+	profilefound = True
+	try:
+		profile = Profile.objects.get(pk=pk)
+		profile.delete()
+	except ObjectDoesNotExist:
+		profilefound = False
+		return JsonResponse("This meal does not exist.",safe=False)
+	if profilefound:
+		return JsonResponse("Deleted profile", safe=False)
+
+def get_recent_meals(request):
+    if request.method == 'GET':
+        recent_meals = Cafe.objects.order_by('-date')[:3]
+        meallist = []
+        for i in recent_meals:
+            meallist.append(model_to_dict(i))
+        return JsonResponse(meallist, safe=False)
+    else:
         return JsonResponse(request, "Must make GET request.",safe=False)
-    c = Cafe.objects.get(pk=comment_id)
-    return JsonResponse({'name': c.name,'location':c.location,'date':c.date,'description':c.description,'Calories':c.Calories})
 
 def retrieve_cafe_all(request):
 		if request.method != 'GET':
@@ -43,62 +176,101 @@ def retrieve_cafe_all(request):
 		for meal in meals:
 			response.append({"name": meal.name,"location": meal.location,"date": meal.date,"description": meal.description,"Calories": meal.Calories,})
 		return JsonResponse({"data": response})
-
-class CommentIndexView(generic.ListView):
-		model = Comment
-		template_name = 'comment.html'
-		context_object_name = 'all_comments'
-
-		def get_queryset(self):
-				return Comment.objects.all()
-
-class CommentCreate(generic.CreateView):
-	model = Comment  
-	success_url = reverse_lazy('comment_list')
-	fields = ['description','feedback','author','date_written','rating','meal'] #fields from model.py
-
-class CommentDelete(generic.DeleteView):
-    model = Comment
-    success_url = reverse_lazy('comment_list')
-
-class CommentUpdate(generic.UpdateView):
-		model = Comment
-		success_url = reverse_lazy('comment_list')
-		#fields = ['description','feedback','author','date_written','rating','meal'] #fields from model.py
-		fields = ['description','feedback','date_written','rating'] #fields from model.py
-
-def retrieve_comment(request, comment_id):
+	
+def retrieve_comment_all(request):
     if request.method != 'GET':
         return JsonResponse(request, "Must make GET request.",safe=False)
-    c = Comment.objects.get(pk=comment_id)
-    return JsonResponse({'description': c.description,'feedback':c.feedback,'date_written':c.date_written,'rating':c.rating})
+    comments = Comment.objects.all()
+    response = []
+    for c in comments:
+    	response.append({'description': c.description,'feedback':c.feedback,'date_written':c.date_written,'rating':c.rating})
+    return JsonResponse(response, safe=False)
 
-class ProfileIndexView(generic.ListView):
-		template_name = 'home.html'
-		context_object_name = 'all_users'
+'''
+Retrieve and Update Cafe, Comment, Profile
+'''
+class CafeRetrieveUpdate(View):
 
-		def get_queryset(self):
-				return Profile.objects.all()
+	def get(self, request, pk):
+		result = {}
+		try:
+			cafe = Cafe.objects.get(pk=pk)
+			result["ok"] = True
+			result["result"] = model_to_dict(cafe)
+		except ObjectDoesNotExist:
+			result["ok"] = False
+			result["result"] = "Cafe does not exist."
+		return JsonResponse(result)
 
-def create_profile(request):
-	if request.method != 'POST':
-		return JsonResponse("Must make POST request.", safe=False)
-	if 'name' not in request.POST:
-		return JsonResponse("Missing required fields.", safe=False)
-	profile = Profile(name=request.POST['name'])
-	try:
-		profile.save()
-	except db.Error:
-		return JsonResponse(str(db.Error), safe=False)
-	return JsonResponse({'profile_id': profile.pk}, safe=False)
+	def post(self, request, pk):
+		result = {}
+		try:
+			cafe = Cafe.objects.get(pk=pk)
+			cafe_fields = [c.name for c in Cafe._meta.get_fields()]
+			for field in cafe_fields:
+				if field in request.POST:
+					setattr(cafe, field, request.POST[field])
+			cafe.save()
+			result["ok"] = True
+			result["result"] = "Cafe updated succesfully."
+		except ObjectDoesNotExist:
+			result["ok"] = False
+			result["result"] = "Cafe does not exist."
+		return JsonResponse(result)
 
-def retrieve_profile(request, profile_id):
-    if request.method != 'GET':
-        return JsonResponse(request, "Must make GET request.",safe=False)
-    try:
-        profile = Profile.objects.get(pk=profile_id)
-    except Profile.DoesNotExist:
-        return JsonResponse(request, "Profile not found.",safe=False)
+class CommentRetrieveUpdate(View):
+	def get(self, request, pk):
+		result = {}
+		try:
+			comment = Comment.objects.get(pk=pk)
+			result["ok"] = True
+			result["result"] = model_to_dict(comment)
+		except ObjectDoesNotExist:
+			result["ok"] = False
+			result["result"] = "Comment does not exist."
+		return JsonResponse(result)
 
-    return JsonResponse({'name': profile.name},safe=False)
+	def post(self, request, pk):
+		result = {}
+		try:
+			comment = Comment.objects.get(pk=pk)
+			comment_fields = [c_field.name for c_field in Comment._meta.get_fields()]
+			for field in comment_fields:
+				if field in request.POST:
+					setattr(comment, field, request.POST[field])
+			comment.save()
+			result["ok"] = True
+			result["result"] = "Comment updated succesfully."
+		except ObjectDoesNotExist:
+			result["ok"] = False
+			result["result"] = "Comment does not exist."
+		return JsonResponse(result)
+
+class ProfileRetrieveUpdate(View):
+	def get(self, request, pk):
+		result = {}
+		try:
+			profile = Profile.objects.get(pk=pk)
+			result["ok"] = True
+			result["result"] = model_to_dict(profile);
+		except ObjectDoesNotExist:
+			result["ok"] = False
+			result["result"] = "Profile does not exist."
+		return JsonResponse(result)
+
+	def post(self, request, pk):
+		result = {}
+		try:
+			profile = Profile.objects.get(pk=pk)
+			profile_fields = [p_field.name for p_field in Profile._meta.get_fields()]
+			for field in profile_fields:
+				if field in request.POST:
+					setattr(profile, field, request.POST[field])
+			profile.save()
+			result["ok"] = True
+			result["result"] = "Profile updated succesfully."
+		except ObjectDoesNotExist:
+			result["ok"] = False
+			result["result"] = "Profile does not exist."
+		return JsonResponse(result)
 

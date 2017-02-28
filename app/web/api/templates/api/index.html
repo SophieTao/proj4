@@ -1,14 +1,27 @@
 {% extends 'base.html' %}
 {% block body %}
-{% if profiles_list %}
-View All Meals
-<br>
-<br>
-    <!--{% for user in profiles_list %}-->
-        <li>{{ profiles_list }}</li>
-    <!--{% endfor %}-->
+{% if recentmeals %}
+Recent Meals
+    <ul>
+    {% for meal in recentmeals %}
+        <li><a href="/meal/{{ meal.id }}/">{{ meal.name }}</a></li>
+        <br>
+    {% endfor %}
     </ul>
 {% else %}
-    <p>No users are available.</p>
-    {%endif%}
+    <p>No recent meals</p>
+{% endif %}
+
+{% if allcomments %}
+All Comments
+    <ul>
+    {% for comment in allcomments %}
+        <li><a href="/comment/{{ comment.id }}/">{{ comment.description }}</a></li>
+        <br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No meals</p>
+{% endif %}
 {% endblock %}
+

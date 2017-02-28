@@ -17,7 +17,7 @@ class Comment(models.Model):
 	description = models.CharField(max_length=1300)
 	feedback = models.CharField(max_length=300)
 	#author = models.ForeignKey(profile_models.Profile, null=True)
-	date_written = models.DateTimeField(null=True)
+	date_written = models.DateTimeField(null=True) 
 	rating = models.PositiveIntegerField(null=True,validators=[MinValueValidator(1), MaxValueValidator(5),])
 	#meal = models.ForeignKey(cafe_models.Cafe, null=True)
 
@@ -30,6 +30,4 @@ class Comment(models.Model):
 class Profile(models.Model):
 	name = models.CharField(max_length=100)
 
-	def __str__(self):
-		return self.name
-
+	
