@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
 {% block body %}
-{% if meals_list %}
+{% if resp %}
     <ul>
-    {% for meal in meals_list %}
     <h2>Meal Detail</h2>
-    		<br>Name: {{ meal.name }}
-        <br>Location: {{ meal.location }}
-        <br>Date: {{ meal.date }}
-        <br>Description: {{ meal.description }}
-        <br>Calories:{{ meal.Calories }}
-    {% endfor %}
+    	<br>Name: {{ resp.result.name }}
+        <br>Location: {{ resp.result.location }}
+        <br>Date: {{ resp.result.date }}
+        <br>Description: {{ resp.result.description }}
+        <br>Calories:{{ resp.result.Calories }}
     </ul>
 {% else %}
     <p>No such meal.</p>

@@ -1,20 +1,17 @@
 {% extends 'base.html' %}
 {% block body %}
-{% if comments_list %}
+{% if resp %}
     <ul>
-    {% for comment in comments_list %}
     <h2>Comment Detail</h2>
-    		<br>Description: {{ comment.description }}
-    		<br>Feedback: {{ comment.feedback }}
-        <br>Date: {{ comment.date_written }}
-        <br>Rating: {{ comment.rating }}
-    {% endfor %}
+        <br>Name: {{ resp.result.description }}
+        <br>Location: {{ resp.result.feedback }}
+        <br>Date: {{ resp.result.date_written }}
+        <br>Description: {{ resp.result.rating }}
     </ul>
 {% else %}
     <p>No such comment.</p>
     {%endif%}
 {% endblock %}    
-
 
 
 

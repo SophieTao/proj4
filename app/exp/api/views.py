@@ -20,13 +20,13 @@ def meal(request, cafe_id):
 	req = urllib.request.Request('http://models-api:8000/api/v1/meals/' + cafe_id)
 	resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 	resp = json.loads(resp_json)
-	return JsonResponse([resp], safe=False)
+	return JsonResponse(resp, safe=False)
 
 def comment(request, comment_id):
 	req = urllib.request.Request('http://models-api:8000/api/v1/comments/' + comment_id)
 	resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 	resp = json.loads(resp_json)
-	return JsonResponse([resp], safe=False)
+	return JsonResponse(resp, safe=False)
 	
 def profile(request, profile_id):
 	req = urllib.request.Request('http://models-api:8000/api/v1/profiles/' + profile_id)

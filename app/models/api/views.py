@@ -178,13 +178,14 @@ def retrieve_cafe_all(request):
 		return JsonResponse({"data": response})
 	
 def retrieve_comment_all(request):
-    if request.method != 'GET':
-        return JsonResponse(request, "Must make GET request.",safe=False)
-    comments = Comment.objects.all()
-    response = []
-    for c in comments:
-    	response.append({'description': c.description,'feedback':c.feedback,'date_written':c.date_written,'rating':c.rating})
-    return JsonResponse(response, safe=False)
+		if request.method == 'GET':
+				comments = Comment.objects.all()
+				commentlist = []
+				for i in comments:
+					commentlist.append(model_to_dict(i))
+				return JsonResponse(commentlist, safe=False)
+		else:
+				return JsonResponse(request, "Must make GET request.",safe=False)
 
 '''
 Retrieve and Update Cafe, Comment, Profile
