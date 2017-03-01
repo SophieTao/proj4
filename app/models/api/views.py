@@ -15,52 +15,58 @@ Cafe (create, edit, delete, retrieve, IndexView)
 '''
 
 def indexView(request):
-	result = {}
-	try:
-		result["ok"] = True
-		result["result"] = [model_to_dict(cafe) for cafe in Cafe.objects.all()]
-	except Exception:
-		result["ok"] = False
-		result["result"] = []
-	return JsonResponse(result)
+	if request.method == 'GET':
+		result = {}
+		try:
+			result["ok"] = True
+			result["result"] = [model_to_dict(cafe) for cafe in Cafe.objects.all()]
+		except Exception:
+			result["ok"] = False
+			result["result"] = []
+		return JsonResponse(result)
+	else:
+		return JsonResponse("Must Get",safe=False)		
 
 def create_cafe(request):
-	result = {}
-	result_msg = None
-	try:
-		req_input = {
-		'name': request.POST['name'],
-		'location':request.POST['location'],
-		'date':request.POST['date'],
-		'description':request.POST['description'],
-		'Calories':request.POST['Calories'],
-		}
-	except KeyError:
-		req_input = {}
-	form = CafeForm(req_input)
-	if form.is_valid():
-		cafe = form.save()
-		result["ok"] = True
-		result["result"] = {"id": cafe.id}
-		return JsonResponse(req_input,safe=False)
+	if request.method == 'POST':
+		result = {}
+		result_msg = None
+		try:
+			req_input = {
+			'name': request.POST['name'],
+			'location':request.POST['location'],
+			'date':request.POST['date'],
+			'description':request.POST['description'],
+			'Calories':request.POST['Calories'],
+			}
+		except KeyError:
+			req_input = {}
+		form = CafeForm(req_input)
+		if form.is_valid():
+			cafe = form.save()
+			result["ok"] = True
+			result["result"] = {"id": cafe.id}
+			return JsonResponse(req_input,safe=False)
+		else:
+			result_msg = "Input did not contain all the required fields."
+			return JsonResponse(result_msg,safe=False)
 	else:
-		result_msg = "Input did not contain all the required fields."
-		return JsonResponse(result_msg,safe=False)
+		return JsonResponse("Must Post",safe=False)		
 
 def delete_cafe(request, pk):
-	resp = {}
-	cafefound = True
-	try:
-		cafe = Cafe.objects.get(pk=pk)
-		cafe.delete()
-	except ObjectDoesNotExist:
-		cafefound = False
-		return JsonResponse("This meal does not exist.",safe=False)
-	if cafefound:
-		return JsonResponse("Deleted meal", safe=False)
-
-
-
+	if request.method == 'POST':
+		resp = {}
+		cafefound = True
+		try:
+			cafe = Cafe.objects.get(pk=pk)
+			cafe.delete()
+		except ObjectDoesNotExist:
+			cafefound = False
+			return JsonResponse("This meal does not exist.",safe=False)
+		if cafefound:
+			return JsonResponse("Deleted meal", safe=False)
+	else:	
+		return JsonResponse("Must Post",safe=False)		
 
 '''
 Comment (create, delete, commentView)
@@ -68,62 +74,73 @@ Comment (create, delete, commentView)
 
 
 def commentView(request):
-	result = {}
-	try:
-		result["ok"] = True
-		result["result"] = [model_to_dict(comment) for comment in Comment.objects.all()]
-	except Exception:
-		result["ok"] = False
-		result["result"] = []
-	return JsonResponse(result)
-
+	if request.method == 'GET':
+		result = {}
+		try:
+			result["ok"] = True
+			result["result"] = [model_to_dict(comment) for comment in Comment.objects.all()]
+		except Exception:
+			result["ok"] = False
+			result["result"] = []
+		return JsonResponse(result)
+	else:
+		return JsonResponse("Must Get",safe=False)		
 
 def create_comment(request):
-	result = {}
-	result_msg = None
-	try:
-		req_input = {
-		'description': request.POST['description'],
-		'feedback':request.POST['feedback'],
-		'date_written':request.POST['date_written'],
-		'rating':request.POST['rating'],
-		}
-	except KeyError:
-		req_input = {}
-		result_msg = "Input did not contain all the required fields."
-	form = CommentForm(req_input)
-	if form.is_valid():
-		comment = form.save()
-		return JsonResponse(req_input,safe=False)
+	if request.method == 'POST':		
+		result = {}
+		result_msg = None
+		try:
+			req_input = {
+			'description': request.POST['description'],
+			'feedback':request.POST['feedback'],
+			'date_written':request.POST['date_written'],
+			'rating':request.POST['rating'],
+			}
+		except KeyError:
+			req_input = {}
+			result_msg = "Input did not contain all the required fields."
+		form = CommentForm(req_input)
+		if form.is_valid():
+			comment = form.save()
+			return JsonResponse(req_input,safe=False)
+		else:
+			return JsonResponse(result_msg,safe=False)
 	else:
-		return JsonResponse(result_msg,safe=False)
+		return JsonResponse("Must Post",safe=False)	
 
 def delete_comment(request, pk):
-	resp = {}
-	commentfound = True
-	try:
-		comment = Comment.objects.get(pk=pk)
-		comment.delete()
-	except ObjectDoesNotExist:
-		commentfound = False
-		return JsonResponse("This comment does not exist.",safe=False)
-	if commentfound:
-		return JsonResponse("Deleted comment " +str(comment.id), safe=False)
-
+	if request.method == 'POST':		
+		resp = {}
+		commentfound = True
+		try:
+			comment = Comment.objects.get(pk=pk)
+			comment.delete()
+		except ObjectDoesNotExist:
+			commentfound = False
+			return JsonResponse("This comment does not exist.",safe=False)
+		if commentfound:
+			return JsonResponse("Deleted comment ", safe=False)
+	else:
+		return JsonResponse("Must Post",safe=False)	
 
 '''
 Profile (create, retrieve, IndexView)
 '''
 
 def profileView(request):
-	result = {}
-	try:
-		result["ok"] = True
-		result["result"] = [model_to_dict(profile) for profile in Profile.objects.all()]
-	except Exception:
-		result["ok"] = False
-		result["result"] = []
-	return JsonResponse(result)
+	if request.method == 'GET':			
+		result = {}
+		try:
+			result["ok"] = True
+			result["result"] = [model_to_dict(profile) for profile in Profile.objects.all()]
+		except Exception:
+			result["ok"] = False
+			result["result"] = []
+		return JsonResponse(result)
+	else:
+		return JsonResponse("Must Get",safe=False)	
+
 
 def create_profile(request):
 	if request.method == 'POST':
@@ -139,16 +156,19 @@ def create_profile(request):
 
 
 def delete_profile(request, pk):
-	resp = {}
-	profilefound = True
-	try:
-		profile = Profile.objects.get(pk=pk)
-		profile.delete()
-	except ObjectDoesNotExist:
-		profilefound = False
-		return JsonResponse("This meal does not exist.",safe=False)
-	if profilefound:
-		return JsonResponse("Deleted profile "+str(profile.id), safe=False)
+	if request.method == 'POST':	
+		resp = {}
+		profilefound = True
+		try:
+			profile = Profile.objects.get(pk=pk)
+			profile.delete()
+		except ObjectDoesNotExist:
+			profilefound = False
+			return JsonResponse("This meal does not exist.",safe=False)
+		if profilefound:
+			return JsonResponse("Deleted profile ", safe=False)
+	else:
+		return JsonResponse("Must Post",safe=False)	
 
 def get_recent_meals(request):
     if request.method == 'GET':
@@ -158,11 +178,11 @@ def get_recent_meals(request):
             meallist.append(model_to_dict(i))
         return JsonResponse(meallist, safe=False)
     else:
-        return JsonResponse(request, "Must make GET request.",safe=False)
+        return JsonResponse("Must make GET request.",safe=False)
 
 def retrieve_cafe_all(request):
 		if request.method != 'GET':
-			return JsonResponse(request, "Must make GET request.",safe=False) 
+			return JsonResponse("Must make GET request.",safe=False) 
 		meals = Cafe.objects.all()
 		response = []
 		for meal in meals:
@@ -177,7 +197,7 @@ def retrieve_comment_all(request):
 					commentlist.append(model_to_dict(i))
 				return JsonResponse(commentlist, safe=False)
 		else:
-				return JsonResponse(request, "Must make GET request.",safe=False)
+				return JsonResponse("Must make GET request.",safe=False)
 
 '''
 Retrieve and Update Cafe, Comment, Profile
