@@ -12,6 +12,18 @@ Recent Meals
     <p>No recent meals</p>
 {% endif %}
 
+{% if allmeals %}
+All Meals
+    <ul>
+    {% for meal in allmeals %}
+        <li><a href="/meal/{{ meal.id }}/">{{ meal.name }}</a></li>
+        <br>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No meals</p>
+{% endif %}
+
 {% if allcomments %}
 All Comments
     <ul>
@@ -21,7 +33,7 @@ All Comments
     {% endfor %}
     </ul>
 {% else %}
-    <p>No meals</p>
+    <p>No comments</p>
 {% endif %}
 {% endblock %}
 

@@ -3,10 +3,10 @@
 {% if resp %}
     <ul>
     <h2>Comment Detail</h2>
-        <br>Name: {{ resp.result.description }}
-        <br>Location: {{ resp.result.feedback }}
-        <br>Date: {{ resp.result.date_written }}
-        <br>Description: {{ resp.result.rating }}
+        <br>Name: {{ resp.description }}
+        <br>Location: {{ resp.feedback }}
+        <br>Date: {{ resp.date_written }}
+        <br>Description: {{ resp.rating }}
     </ul>
 {% else %}
     <p>No such comment.</p>

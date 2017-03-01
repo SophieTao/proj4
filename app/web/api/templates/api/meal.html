@@ -3,11 +3,11 @@
 {% if resp %}
     <ul>
     <h2>Meal Detail</h2>
-    	<br>Name: {{ resp.result.name }}
-        <br>Location: {{ resp.result.location }}
-        <br>Date: {{ resp.result.date }}
-        <br>Description: {{ resp.result.description }}
-        <br>Calories:{{ resp.result.Calories }}
+    	<br>Name: {{ resp.name }}
+        <br>Location: {{ resp.location }}
+        <br>Date: {{ resp.date }}
+        <br>Description: {{ resp.description }}
+        <br>Calories:{{ resp.Calories }}
     </ul>
 {% else %}
     <p>No such meal.</p>

@@ -14,7 +14,11 @@ def home(request):
 	req1 = urllib.request.Request('http://models-api:8000/api/v1/recentmeals')
 	resp_json1 = urllib.request.urlopen(req1).read().decode('utf-8')
 	resp1 = json.loads(resp_json1)
-	return JsonResponse([resp1, resp],safe=False)
+
+	req2 = urllib.request.Request('http://models-api:8000/api/v1/allmeals')
+	resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
+	resp2 = json.loads(resp_json2)
+	return JsonResponse([resp1, resp2, resp],safe=False)
 
 def meal(request, cafe_id):
 	req = urllib.request.Request('http://models-api:8000/api/v1/meals/' + cafe_id)

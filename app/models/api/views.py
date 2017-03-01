@@ -37,14 +37,14 @@ def create_cafe(request):
 		}
 	except KeyError:
 		req_input = {}
-		result_msg = "Input did not contain all the required fields."
 	form = CafeForm(req_input)
 	if form.is_valid():
 		cafe = form.save()
 		result["ok"] = True
 		result["result"] = {"id": cafe.id}
-		return JsonResponse(result)
+		return JsonResponse(req_input,safe=False)
 	else:
+		result_msg = "Input did not contain all the required fields."
 		return JsonResponse(result_msg,safe=False)
 
 def delete_cafe(request, pk):
@@ -94,9 +94,7 @@ def create_comment(request):
 	form = CommentForm(req_input)
 	if form.is_valid():
 		comment = form.save()
-		result["ok"] = True
-		result["result"] = {"id": comment.id}
-		return JsonResponse(result)
+		return JsonResponse(req_input,safe=False)
 	else:
 		return JsonResponse(result_msg,safe=False)
 
@@ -110,7 +108,7 @@ def delete_comment(request, pk):
 		commentfound = False
 		return JsonResponse("This comment does not exist.",safe=False)
 	if commentfound:
-		return JsonResponse("Deleted comment", safe=False)
+		return JsonResponse("Deleted comment " +str(comment.id), safe=False)
 
 
 '''
@@ -128,23 +126,17 @@ def profileView(request):
 	return JsonResponse(result)
 
 def create_profile(request):
-	result = {}
-	result_msg = None
-	try:
-		req_input = {
-		'name': request.POST['name'],
-		}
-	except KeyError:
-		req_input = {}
-		result_msg = "Input did not contain all the required fields."
-	form = ProfileForm(req_input)
-	if form.is_valid():
-		profile = form.save()
-		result["ok"] = True
-		result["result"] = {"id": profile.id}
-		return JsonResponse(result)
+	if request.method == 'POST':
+		user = Profile()
+		try:
+			user.name = request.POST['name']
+		except KeyError:
+			return JsonResponse("Input did not contain all the required fields.",safe=False)
+		user.save()
+		return JsonResponse(model_to_dict(user))
 	else:
-		return JsonResponse(result_msg,safe=False)
+		return JsonResponse("Must Post",safe=False)
+
 
 def delete_profile(request, pk):
 	resp = {}
@@ -156,7 +148,7 @@ def delete_profile(request, pk):
 		profilefound = False
 		return JsonResponse("This meal does not exist.",safe=False)
 	if profilefound:
-		return JsonResponse("Deleted profile", safe=False)
+		return JsonResponse("Deleted profile "+str(profile.id), safe=False)
 
 def get_recent_meals(request):
     if request.method == 'GET':
@@ -174,8 +166,8 @@ def retrieve_cafe_all(request):
 		meals = Cafe.objects.all()
 		response = []
 		for meal in meals:
-			response.append({"name": meal.name,"location": meal.location,"date": meal.date,"description": meal.description,"Calories": meal.Calories,})
-		return JsonResponse({"data": response})
+			response.append(model_to_dict(meal))
+		return JsonResponse(response,safe=False)
 	
 def retrieve_comment_all(request):
 		if request.method == 'GET':
@@ -196,12 +188,9 @@ class CafeRetrieveUpdate(View):
 		result = {}
 		try:
 			cafe = Cafe.objects.get(pk=pk)
-			result["ok"] = True
-			result["result"] = model_to_dict(cafe)
+			return JsonResponse(model_to_dict(cafe))
 		except ObjectDoesNotExist:
-			result["ok"] = False
-			result["result"] = "Cafe does not exist."
-		return JsonResponse(result)
+			return JsonResponse("Cafe does not exist.",safe=False)
 
 	def post(self, request, pk):
 		result = {}
@@ -212,24 +201,18 @@ class CafeRetrieveUpdate(View):
 				if field in request.POST:
 					setattr(cafe, field, request.POST[field])
 			cafe.save()
-			result["ok"] = True
-			result["result"] = "Cafe updated succesfully."
+			return JsonResponse(model_to_dict(cafe))			
 		except ObjectDoesNotExist:
-			result["ok"] = False
-			result["result"] = "Cafe does not exist."
-		return JsonResponse(result)
+			return JsonResponse("Cafe does not exist.",safe=False)
 
 class CommentRetrieveUpdate(View):
 	def get(self, request, pk):
 		result = {}
 		try:
 			comment = Comment.objects.get(pk=pk)
-			result["ok"] = True
-			result["result"] = model_to_dict(comment)
+			return JsonResponse(model_to_dict(comment))
 		except ObjectDoesNotExist:
-			result["ok"] = False
-			result["result"] = "Comment does not exist."
-		return JsonResponse(result)
+			return JsonResponse("Comment does not exist.",safe=False)
 
 	def post(self, request, pk):
 		result = {}
@@ -240,24 +223,18 @@ class CommentRetrieveUpdate(View):
 				if field in request.POST:
 					setattr(comment, field, request.POST[field])
 			comment.save()
-			result["ok"] = True
-			result["result"] = "Comment updated succesfully."
+			return JsonResponse(model_to_dict(comment))			
 		except ObjectDoesNotExist:
-			result["ok"] = False
-			result["result"] = "Comment does not exist."
-		return JsonResponse(result)
+			return JsonResponse("Comment does not exist.",safe=False)
 
 class ProfileRetrieveUpdate(View):
 	def get(self, request, pk):
 		result = {}
 		try:
 			profile = Profile.objects.get(pk=pk)
-			result["ok"] = True
-			result["result"] = model_to_dict(profile);
+			return JsonResponse(model_to_dict(profile))			
 		except ObjectDoesNotExist:
-			result["ok"] = False
-			result["result"] = "Profile does not exist."
-		return JsonResponse(result)
+			return JsonResponse("Profile does not exist.",safe=False)
 
 	def post(self, request, pk):
 		result = {}
@@ -268,10 +245,7 @@ class ProfileRetrieveUpdate(View):
 				if field in request.POST:
 					setattr(profile, field, request.POST[field])
 			profile.save()
-			result["ok"] = True
-			result["result"] = "Profile updated succesfully."
+			return JsonResponse(model_to_dict(profile))			
 		except ObjectDoesNotExist:
-			result["ok"] = False
-			result["result"] = "Profile does not exist."
-		return JsonResponse(result)
+			return JsonResponse("Profile does not exist.",safe=False)
 
