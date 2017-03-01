@@ -1,27 +1,15 @@
 {% extends 'base.html' %}
 {% block body %}
-{% if recentmeals %}
-Recent Meals
+{% if meals %}
+Meals
     <ul>
-    {% for meal in recentmeals %}
+    {% for meal in meals %}
         <li><a href="/meal/{{ meal.id }}/">{{ meal.name }}</a></li>
         <br>
     {% endfor %}
     </ul>
 {% else %}
     <p>No recent meals</p>
-{% endif %}
-
-{% if allmeals %}
-All Meals
-    <ul>
-    {% for meal in allmeals %}
-        <li><a href="/meal/{{ meal.id }}/">{{ meal.name }}</a></li>
-        <br>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No meals</p>
 {% endif %}
 
 {% if allcomments %}

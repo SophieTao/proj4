@@ -18,7 +18,11 @@ def home(request):
 	req2 = urllib.request.Request('http://models-api:8000/api/v1/allmeals')
 	resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
 	resp2 = json.loads(resp_json2)
-	return JsonResponse([resp1, resp2, resp],safe=False)
+
+	if len(resp1) < 3:
+		return JsonResponse([resp2, resp],safe=False)
+	else:
+		return JsonResponse([resp1, resp],safe=False)
 
 def meal(request, cafe_id):
 	req = urllib.request.Request('http://models-api:8000/api/v1/meals/' + cafe_id)

@@ -164,7 +164,7 @@ def delete_profile(request, pk):
 			profile.delete()
 		except ObjectDoesNotExist:
 			profilefound = False
-			return JsonResponse("This meal does not exist.",safe=False)
+			return JsonResponse("This profile does not exist.",safe=False)
 		if profilefound:
 			return JsonResponse("Deleted profile ", safe=False)
 	else:

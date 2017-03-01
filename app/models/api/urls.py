@@ -18,7 +18,7 @@ urlpatterns = [
     url(r'^allcomments$', views.retrieve_comment_all,name='all_comments'),
 
     url(r'^$', views.profileView, name='home'),
-    url(r'^profiles/create$', views.create_profile),    
+    url(r'^profiles/create$', views.create_profile, name='profile-add'),    
     url(r'^profiles/(?P<pk>\d+)/delete$', views.delete_profile, name='profile-delete'),
     url(r'^profiles/(?P<pk>[0-9]+)$', ProfileRetrieveUpdate.as_view(), name="retrieve_update_profiles"),
 

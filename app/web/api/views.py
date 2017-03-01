@@ -9,7 +9,7 @@ def home(request):
     req = urllib.request.Request('http://exp-api:8000/home/')
     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
     resp = json.loads(resp_json)  
-    context = {'recentmeals': resp[0],'allmeals': resp[1],'allcomments': resp[2]}
+    context = {'meals': resp[0],'allcomments': resp[1]}
     return render(request, 'api/index.html', context)
 
 def meal(request, cafe_id):
