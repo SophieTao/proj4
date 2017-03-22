@@ -45,7 +45,18 @@ def profile(request, profile_id):
 	return JsonResponse([resp], safe=False)
 
 ############## user management (login, logout, create account) ###############
+def login(request):
+	if request.method == "POST":		
+		postData = urllib.parse.urlencode((request.POST).dict()).encode('utf-8')
+		try:
+			req = urllib.request.Request('http://models-api:8000/api/v1/profiles/retrieve', postData)
+		except ObjectDoesNotExist:
+			return JsonResponse("Fail to Login", safe=False)	
+		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+		resp = json.loads(resp_json)
+		return JsonResponse(resp, safe=False)
 
+	
 
 def logout(request):
 	if request.method == "POST":
