@@ -45,50 +45,7 @@ def profile(request, profile_id):
 	return JsonResponse([resp], safe=False)
 
 ############## user management (login, logout, create account) ###############
-# def login(request):
-# 	if request.method == "POST":
-# 		errorStrings = ""
-		
-# 		postData = urllib.parse.urlencode((request.POST).dict()).encode('utf-8')
-# 		try:
-# 		req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', data=postData)
-# 	except e:
-#     	return JsonResponse("Fail to Login", safe=False)	
-# 		resp = urllib.request.urlopen(req).read().decode('utf-8')
-# 		if resp == "Correct":
-# 			authenticator = hmac.new(
-# 			        key = settings.SECRET_KEY.encode('utf-8'),
-# 			        msg = os.urandom(32),
-# 			        digestmod = 'sha256',
-# 			    ).hexdigest()
-# 			logger.error(authenticator)
-# 			auth_encoded = urllib.parse.urlencode({"name": request.POST["name"], "authenticator": authenticator}).encode('utf-8')
-# 			req2 = urllib.request.Request('http://models-api:8000/api/v1/authenticator/create/', data=auth_encoded, method='POST')
-# 			resp2_json = urllib.request.urlopen(req2, timeout=5).read().decode('utf-8')
-# 			try:
-# 				resp2 = json.loads(resp2_json)
-# 			except ValueError:
-# 				resp2 = False
-# 				errorStrings = resp2_json
-# 			return JsonResponse([resp2, errorStrings], safe=False)
-# 		else:
-# 			return JsonResponse([False, resp], safe=False)
-# 	else:
-# 		return HttpResponse("ERROR: Endpoint only accepts POST requests")
 
-
-
-#     post_data = {"name": name, "password": password}
-#     postData = urllib.parse.urlencode(post_data).encode("utf-8")
-#     try:
-#     	req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', postData)
-#     except e:
-#     	return JsonResponse("Fail to Login", safe=False)	
-#     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-#     resp = json.loads(resp_json)
-#     return JsonResponse(resp, safe=False)
-
-	
 
 def logout(request):
 	if request.method == "POST":
