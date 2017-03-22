@@ -19,7 +19,14 @@ urlpatterns = [
 
     url(r'^$', views.profileView, name='home'),
     url(r'^profiles/create$', views.create_profile, name='profile-add'),    
-    url(r'^profiles/(?P<pk>\d+)/delete$', views.delete_profile, name='profile-delete'),
+    url(r'^profiles/delete/(?P<pk>\d+)$', views.delete_profile, name='profile-delete'),
     url(r'^profiles/(?P<pk>[0-9]+)$', ProfileRetrieveUpdate.as_view(), name="retrieve_update_profiles"),
+    url(r'^profiles/retrieve$', views.retrieve_profile, name='profile-retrieve'),
+
+    url(r'^auth/create$', views.createAuth, name="create_auth"),
+    url(r'^auth/delete/(?P<authenticator>\w+)$', views.deleteAuth, name="delete_auth"),
+    url(r'^auth/(?P<authenticator>\w+)$', views.auth, name="auth_user"),
+    url(r'^auth/get/(?P<pk>\d+)$', views.getAuth, name="get_auth"),
+
 
 ]

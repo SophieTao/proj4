@@ -2,6 +2,24 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+class Profile(models.Model):
+	name = models.CharField(max_length=100, unique=True)
+	email = models.CharField(max_length=100, unique=True, null=True)
+	password = models.CharField(max_length=100, null=True)
+
+	def __str__(self):
+		return self.name
+
+class Authenticator(models.Model):
+	user_id = models.PositiveIntegerField(null=True)
+	#auth_user = models.ForeignKey(Profile, related_name='auth_user')
+	authenticator = models.CharField(primary_key=True, max_length=255)
+	date_created = models.DateTimeField(auto_now_add=True)
+
+	def __str__(self):
+		return self.user_id
+	
+
 # Create your models here.
 class Cafe(models.Model):
 	name = models.CharField(max_length=100,null=True)
@@ -27,7 +45,4 @@ class Comment(models.Model):
 	def get_absolute_url(self):
 		return reverse('comment-update', kwargs={'pk': self.pk})
 
-class Profile(models.Model):
-	name = models.CharField(max_length=100)
 
-	

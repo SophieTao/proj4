@@ -1,5 +1,9 @@
 from django.views.generic import View
+from django.views.decorators.http import require_http_methods
 from django.views import generic 
+import hmac
+import os
+from django.contrib.auth import hashers
 from django.core.exceptions import ObjectDoesNotExist
 from .models import *
 from django.forms.models import model_to_dict
@@ -9,6 +13,80 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.core import serializers
 from django.shortcuts import render, redirect
 from .forms import *
+from models import settings
+import datetime
+
+'''
+Check password, create/delete/get authenticator
+'''
+# def check_user_password(request):
+# 	email_addr = request.POST.get('email')
+# 	password = request.POST.get('password')
+# 	found_profile = True
+# 	try:
+# 		user = Profile.objects.get(email=email_addr)
+# 	except ObjectDoesNotExist:
+# 		found_profile = False
+# 	resp = {}
+# 	if (found_profile and hashers.check_password(password, user.password)):
+# 		resp['ok'] = True
+# 		resp['result'] = model_to_dict(user)
+# 	else:
+# 		resp['ok'] = False
+# 		resp['result'] = "Invalid email or password"
+# 	return JsonResponse(resp)
+
+def createAuth(request):
+	if request.method != 'POST':
+		return JsonResponse("Must Post",safe=False)		
+	try:
+		u = Profile.objects.get(name = request.POST['name'])
+	except Profile.DoesNotExist:
+		return JsonResponse("User Does Not Exist",safe=False)
+	try:
+		user = Authenticator.objects.get(user_id=u.pk)
+		deleteAuth(request,user.authenticator)
+	except Authenticator.DoesNotExist:
+		pass
+	auth_hash = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256').hexdigest()
+	auth = Authenticator.objects.create(user_id = u.pk, authenticator=auth_hash, date_created = datetime.datetime.now())
+	try:
+		auth.save()
+		resp=model_to_dict(auth)
+		return JsonResponse(resp)
+		#resp['ok'] = True
+		#resp["result"] = {"authenticator": model_to_dict(auth)}
+	except:
+		#resp['ok'] = Fals
+		return JsonResponse("Failed to create authenticator", safe=False)
+
+def getAuth(request, pk):
+	if request.method == 'GET':
+		auth = Authenticator.objects.filter(user_id=pk)
+		alist = []
+		for i in auth:
+			alist.append(model_to_dict(i))
+			return JsonResponse(alist, safe=False)
+		return JsonResponse("User does not exist", safe=False)
+	else:
+		return JsonResponse("Must Get",safe=False)	
+
+def deleteAuth(request,authenticator):
+	try:
+		authenticator = Authenticator.objects.get(pk=authenticator)
+	except ObjectDoesNotExist:
+		return JsonResponse("User has not  been authenticated yet.",safe=False)
+	authenticator.delete()
+	return JsonResponse("Successfully deleted user authentication",safe=False)
+
+def auth(request,authenticator):
+	try:
+		authenticator = Authenticator.objects.get(pk=authenticator)
+	except ObjectDoesNotExist:
+		return JsonResponse("User cannot be authenticated.",safe=False)
+	return JsonResponse("Successfully authenticated user",safe=False)
+
+
 
 '''
 Cafe (create, edit, delete, retrieve, IndexView)
@@ -146,11 +224,21 @@ def create_profile(request):
 	if request.method == 'POST':
 		user = Profile()
 		try:
-			user.name = request.POST['name']
-		except KeyError:
-			return JsonResponse("Input did not contain all the required fields.",safe=False)
-		user.save()
-		return JsonResponse(model_to_dict(user))
+			u = Profile.objects.get(name=request.POST['name'])
+		except ObjectDoesNotExist:
+			try:
+				v = Profile.objects.get(name=request.POST['email'])
+			except ObjectDoesNotExist:
+				try:
+					user.name = request.POST['name']
+					user.email = request.POST['email']
+					user.password = hashers.make_password(request.POST['password'])
+				except KeyError:
+					return JsonResponse("Input did not contain all the required fields.",safe=False)
+				user.save()
+				return JsonResponse(model_to_dict(user))
+			return JsonResponse("unique",safe=False)
+		return JsonResponse("unique2",safe=False)
 	else:
 		return JsonResponse("Must Post",safe=False)
 
@@ -169,6 +257,23 @@ def delete_profile(request, pk):
 			return JsonResponse("Deleted profile ", safe=False)
 	else:
 		return JsonResponse("Must Post",safe=False)	
+
+def retrieve_profile(request):
+	if request.method == 'POST':
+		try:
+			profile = Profile.objects.get(name=request.POST['name'])
+			p = [model_to_dict(profile)];
+			#return JsonResponse(model_to_dict(profile))
+		except ObjectDoesNotExist:
+			return JsonResponse("Profile does not exist.",safe=False)
+		if hashers.check_password(request.POST["password"], model_to_dict(profile)["password"]):
+			return JsonResponse(model_to_dict(profile))			
+		else:
+			return JsonResponse("Incorrect Password", safe=False)
+		
+	else:
+		return JsonResponse("Must Post",safe=False)
+
 
 def get_recent_meals(request):
     if request.method == 'GET':
@@ -249,10 +354,10 @@ class CommentRetrieveUpdate(View):
 
 class ProfileRetrieveUpdate(View):
 	def get(self, request, pk):
-		result = {}
 		try:
 			profile = Profile.objects.get(pk=pk)
-			return JsonResponse(model_to_dict(profile))			
+			if hashers.check_password(request.POST['password'], profile.password):
+				return JsonResponse(model_to_dict(profile))			
 		except ObjectDoesNotExist:
 			return JsonResponse("Profile does not exist.",safe=False)
 
