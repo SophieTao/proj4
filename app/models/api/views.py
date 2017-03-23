@@ -37,28 +37,32 @@ Check password, create/delete/get authenticator
 # 	return JsonResponse(resp)
 
 def createAuth(request):
-	if request.method != 'POST':
+	if request.method == 'POST':
+		try:
+			u = Profile.objects.get(name = request.POST['name'])
+		except Profile.DoesNotExist:
+			return JsonResponse("User Does Not Exist",safe=False)
+		if not hashers.check_password(request.POST["password"], u.password):
+			return JsonResponse("Incorrect password", safe=False)	
+		#	Check if the newly generated authenticator already exists in the database
+		try: 
+			user = Authenticator.objects.get(user_id=u.pk)
+			deleteAuth(request,user.authenticator)
+		except Authenticator.DoesNotExist:
+			pass
+		auth_hash = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256').hexdigest()
+		auth = Authenticator.objects.create(user_id = u.pk, authenticator=auth_hash, date_created = datetime.datetime.now())
+		try:
+			auth.save()
+			resp=model_to_dict(auth)
+			return JsonResponse(resp)
+			#resp['ok'] = True
+			#resp["result"] = {"authenticator": model_to_dict(auth)}
+		except KeyError:
+			#resp['ok'] = False
+			return JsonResponse("Failed to create authenticator", safe=False)
+	else:
 		return JsonResponse("Must Post",safe=False)		
-	try:
-		u = Profile.objects.get(name = request.POST['name'])
-	except Profile.DoesNotExist:
-		return JsonResponse("User Does Not Exist",safe=False)
-	try:
-		user = Authenticator.objects.get(user_id=u.pk)
-		deleteAuth(request,user.authenticator)
-	except Authenticator.DoesNotExist:
-		pass
-	auth_hash = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256').hexdigest()
-	auth = Authenticator.objects.create(user_id = u.pk, authenticator=auth_hash, date_created = datetime.datetime.now())
-	try:
-		auth.save()
-		resp=model_to_dict(auth)
-		return JsonResponse(resp)
-		#resp['ok'] = True
-		#resp["result"] = {"authenticator": model_to_dict(auth)}
-	except:
-		#resp['ok'] = Fals
-		return JsonResponse("Failed to create authenticator", safe=False)
 
 def getAuth(request, pk):
 	if request.method == 'GET':
@@ -83,8 +87,8 @@ def auth(request,authenticator):
 	try:
 		authenticator = Authenticator.objects.get(pk=authenticator)
 	except ObjectDoesNotExist:
-		return JsonResponse("User cannot be authenticated.",safe=False)
-	return JsonResponse("Successfully authenticated user",safe=False)
+		return JsonResponse("Authenticator does not exist.",safe=False)
+	return JsonResponse("This is an authenticated user",safe=False)
 
 
 

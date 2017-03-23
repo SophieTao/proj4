@@ -46,12 +46,13 @@ def profile(request, profile_id):
 
 ############## user management (login, logout, create account) ###############
 def login(request):
-	if request.method == "POST":		
-		postData = urllib.parse.urlencode((request.POST).dict()).encode('utf-8')
+	if request.method == "POST":	
+		post = (request.POST).dict()
+		data = urllib.parse.urlencode(post).encode('utf-8')
 		try:
-			req = urllib.request.Request('http://models-api:8000/api/v1/profiles/retrieve', postData)
+			req = urllib.request.Request('http://models-api:8000/api/v1/profiles/retrieve', data)
 		except ObjectDoesNotExist:
-			return JsonResponse("Fail to Login", safe=False)	
+			return JsonResponse("Fail to login", safe=False)	
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 		resp = json.loads(resp_json)
 		return JsonResponse(resp, safe=False)
@@ -60,7 +61,8 @@ def login(request):
 
 def logout(request):
 	if request.method == "POST":
-		post_encoded = urllib.parse.urlencode((request.POST).dict()).encode('utf-8')
+		post = (request.POST).dict()
+		post_encoded = urllib.parse.urlencode(post).encode('utf-8')
 		try:
 			req = urllib.request.Request('http://models-api:8000/api/v1/auth/get/' + request.POST["pk"])
 		except ObjectDoesNotExist:
@@ -79,7 +81,8 @@ def logout(request):
 
 def create_account(request):
 	if request.method == "POST":
-		data = urllib.parse.urlencode((request.POST).dict()).encode('utf-8')
+		post = (request.POST).dict()
+		data = urllib.parse.urlencode(post).encode('utf-8')
 		req = urllib.request.Request('http://models-api:8000/api/v1/profiles/create', data)
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 		try:
@@ -97,8 +100,8 @@ def create_account(request):
 		return JsonResponse("Must Post", safe=False)
 
 def getAuthUser(request):
-    post_data = request.POST.dict()
-    resp = requestPost('auth_user/', post_data)
+    post = request.POST.dict()
+    resp = requestPost('auth_user/', post)
     auth_valid = True
     if resp['ok']:
         authenticator = resp['result']['auth']
@@ -135,7 +138,22 @@ def requestGet(url):
     return json.loads(resp_json)
 ########################################
 
-
+def create_listing(request):
+	if request.method == "POST":
+		post = (request.POST).dict()
+		req = urllib.request.Request('http://models-api:8000/api/v1/auth/' + str(post["authenticator"]))
+		resp = urllib.request.urlopen(req).read().decode('utf-8')
+		if resp != "\"This is an authenticated user\"":
+			return JsonResponse("Only authenticated users can create new listings.", safe=False)
+		data = urllib.parse.urlencode(post).encode('utf-8')
+		req2 = urllib.request.Request('http://models-api:8000/api/v1/meals/create', data)
+		try:
+			resp2 = json.loads(urllib.request.urlopen(req2).read().decode('utf-8'))
+		except KeyError:
+			return JsonResponse("Cannot create new listing", safe=False)
+		return JsonResponse(resp2, safe=False)
+	else:
+		return HttpResponse("Must Post")
 
 
 
