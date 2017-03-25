@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+{% if next %}
+    <form action="/login/?next={{next}}" method="post">
+    	<label for="name">Username: </label>
+        <input id="name" type="text" name="name" value="{{ name }}">
+        <label for="email">Email: </label>
+        <input id="email" type="text" name="email" value="{{ email }}">
+        <label for="password">Password: </label>
+        <input id="password" type="password" name="password" value="{{ password }}">
+        <input type="submit" value="OK">
+    </form>
+{% else %}
+    <form action="/login/" method="post">
+        <label for="name">Username: </label>
+        <input id="name" type="text" name="name" value="{{ name }}">
+        <label for="email">Email: </label>
+        <input id="email" type="text" name="email" value="{{ email }}">
+        <label for="password">Password: </label>
+        <input id="password" type="password" name="password" value="{{ password }}">
+        <input type="submit" value="OK">
+    </form>
+{% endif %}
+{% endblock %}

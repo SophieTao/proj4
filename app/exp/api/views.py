@@ -47,10 +47,10 @@ def profile(request, profile_id):
 ############## user management (login, logout, create account) ###############
 def login(request):
 	if request.method == "POST":	
-		post = (request.POST).dict()
+		post = request.POST.dict()
 		data = urllib.parse.urlencode(post).encode('utf-8')
 		try:
-			req = urllib.request.Request('http://models-api:8000/api/v1/profiles/retrieve', data)
+			req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', data)
 		except ObjectDoesNotExist:
 			return JsonResponse("Fail to login", safe=False)	
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
@@ -61,7 +61,7 @@ def login(request):
 
 def logout(request):
 	if request.method == "POST":
-		post = (request.POST).dict()
+		post = request.POST.dict()
 		post_encoded = urllib.parse.urlencode(post).encode('utf-8')
 		try:
 			req = urllib.request.Request('http://models-api:8000/api/v1/auth/get/' + request.POST["pk"])
@@ -81,7 +81,7 @@ def logout(request):
 
 def create_account(request):
 	if request.method == "POST":
-		post = (request.POST).dict()
+		post = request.POST.dict()
 		data = urllib.parse.urlencode(post).encode('utf-8')
 		req = urllib.request.Request('http://models-api:8000/api/v1/profiles/create', data)
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
@@ -89,7 +89,7 @@ def create_account(request):
 			resp = json.loads(resp_json)
 		except ObjectDoesNotExist:
 			return JsonResponse("Cannot create profile", safe=False)
-		auth = urllib.parse.urlencode({"name": resp['name']}).encode('utf-8')
+		auth = urllib.parse.urlencode(post).encode('utf-8')
 		req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', auth)
 		try:
 			resp2 = json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
@@ -99,23 +99,25 @@ def create_account(request):
 	else:
 		return JsonResponse("Must Post", safe=False)
 
-def getAuthUser(request):
-    post = request.POST.dict()
-    resp = requestPost('auth_user/', post)
-    auth_valid = True
-    if resp['ok']:
-        authenticator = resp['result']['auth']
-        if authenticator['date_created'] < (timezone.now() - datetime.timedelta(days=1)).isoformat():
-            auth_valid = False
-    else:
-        auth_valid = False
-    if auth_valid:
-        name = resp['result']['user']['name']
-        result = {'result': name, 'ok': True}
-    else:
-        result = {'result': 'Invalid authenticator', 'ok': False}
-    return JsonResponse(result)
+# def getAuthUser(request):
+#     post = request.POST.dict()
+#     data = urllib.parse.urlencode(post).encode('utf-8')
+#     req = urllib.request.Request('http://models-api:8000/api/v1/auth/' + str(post["authenticator"]))
+#     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+#     if resp_json != "\"This is an authenticated user\"":
+#     	return JsonResponse("Invalid authenticator.", safe=False)
+#     if post['date_created'] >= (timezone.now() - datetime.timedelta(days=1)).isoformat():
+#     	resp = json.loads(resp_json)
+#     	for i in resp:
+#     		try:
+#     			r = urllib.request.Request('http://models-api:8000/api/v1/auth/delete/' + str(i["authenticator"]))
+#     		except ObjectDoesNotExist:
+#     			return JsonResponse("Cannot delete expired authenticator", safe=False)	
+#     		return JsonResponse("Expired authenticator.", safe=False)
+#     else:
+#     	return JsonResponse("Valid authenticator.", safe=False)
 
+    
 def authenticate(request, authenticator):
 	try:
 		req = urllib.request.Request('http://models-api:8000/api/v1/auth/' + str(authenticator))

@@ -14,7 +14,7 @@ class Authenticator(models.Model):
 	user_id = models.PositiveIntegerField(null=True)
 	#auth_user = models.ForeignKey(Profile, related_name='auth_user')
 	authenticator = models.CharField(primary_key=True, max_length=255)
-	date_created = models.DateTimeField(auto_now_add=True)
+	date_created = models.DateTimeField()
 
 	def __str__(self):
 		return self.user_id

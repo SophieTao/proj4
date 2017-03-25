@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<form action="/create_listing/" method="post">
+    <label for="name">Name: </label>
+    <input id="name" type="text" name="name" value="{{ name }}"><br>
+    <label for="description">Description: </label>
+    <input id="description" type="text" name="description" value="{{ description }}"><br>
+    <label for="location">Location: </label>
+    <input id="location" type="text" name="location" value="{{ location }}"><br>
+    <label for="feedback">Feedback: </label>
+    <input id="feedback" type="texfeedbackt" name="feedback" value="{{ feedback }}"><br>
+    <input type="submit" value="OK">
+</form>
+{% endif %}
+{% endblock %}

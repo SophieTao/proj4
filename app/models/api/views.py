@@ -51,7 +51,7 @@ def createAuth(request):
 		except Authenticator.DoesNotExist:
 			pass
 		auth_hash = hmac.new(key = settings.SECRET_KEY.encode('utf-8'), msg = os.urandom(32), digestmod = 'sha256').hexdigest()
-		auth = Authenticator.objects.create(user_id = u.pk, authenticator=auth_hash, date_created = datetime.datetime.now())
+		auth = Authenticator.objects.create(date_created = datetime.datetime.now(), user_id = u.pk, authenticator=auth_hash)
 		try:
 			auth.save()
 			resp=model_to_dict(auth)

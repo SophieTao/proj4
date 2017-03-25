@@ -10,7 +10,7 @@ urlpatterns = [
 		url(r'^login$', views.login, name='login'),
 		url(r'^logout$', views.logout, name='logout'),
 		url(r'^create_account$', views.create_account, name='create_account'),
-    url(r'^auth/(?P<authenticator>\w+)$', views.getAuthUser, name='auth_user'),
+    #url(r'^auth$', views.getAuthUser, name='auth_user'),
     url(r'^listing/create$', views.create_listing, name='create_listing'),
 
 ]

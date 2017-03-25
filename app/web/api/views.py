@@ -1,5 +1,9 @@
 from django.shortcuts import render, redirect
 from django.core import serializers
+from .forms import CreateAccountForm, CreateListingForm, LoginForm
+from django.http import JsonResponse
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 import urllib
 import urllib.request
 import urllib.parse
@@ -28,4 +32,61 @@ def comment(request, comment_id):
 
 
 
+def login(request):
+	if request.method == 'GET':
+		next = request.GET.get('next') or reverse('home')
+		form = LoginForm()
+		#return JsonResponse("get",safe=False)	
+		return render(request, 'api/login.html', {'form': form, 'next': next})
+	if request.method == 'POST':
+		form = LoginForm(request.POST)
+		if not form.is_valid():
+			return JsonResponse("resp",safe=False)	
+		next = form.cleaned_data.get('next') or reverse('home')
+		post = urllib.parse.urlencode(form.cleaned_data).encode('utf-8')
+		req = urllib.request.Request('http://exp-api:8000/login', post)
+		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+		resp = json.loads(resp_json)
+		authenticator = resp['authenticator']
+		response = HttpResponseRedirect(next)
+		response.set_cookie("auth", authenticator)
+		return response
 
+def logout(request):
+    auth = request.COOKIES.get('auth')
+    post = urllib.parse.urlencode({"authenticator": auth}).encode('utf-8')
+    req = urllib.request.Request('http://exp-api:8000/logout', post)
+    resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+    response = HttpResponseRedirect(reverse('home') + "?success=logout")
+    response.delete_cookie("auth")
+    return response		
+
+def create_account(request):
+	if request.method == 'GET':
+		form = CreateAccountForm()
+		return render(request, 'api/create_account.html', {'form': form})
+	form = CreateAccountForm(request.POST)
+	if not form.is_valid():
+		return render(request, 'api/create_account.html', {'form': form})
+	username = form.cleaned_data['username']
+	email = form.cleaned_data['email']
+	password = form.cleaned_data['password']
+	post_data = {'username': username,
+				 'email': email,
+				 'password': password,}
+	post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+	req = urllib.request.Request('http://exp-api:8000/create_account', data=post_encoded)
+	resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+	resp = json.loads(resp_json)
+	return HttpResponseRedirect("check")
+	if not resp or not resp['ok']:
+		return render(request, 'api/create_account.html', {'form': form, 'error': True})
+	post_data = {'email': email, 'password': password}
+	post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
+	req = urllib.request.Request('http://exp-api:8000/login/', data=post_encoded, method='POST')
+	resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+	resp = json.loads(resp_json)
+	authenticator = resp['result']['authenticator']
+	response = HttpResponseRedirect(reverse('index'))
+	response.set_cookie("auth", authenticator["authenticator"])
+	return response
