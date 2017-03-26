@@ -10,10 +10,10 @@ class CreateListingForm(forms.Form):
 	name = forms.CharField(label='Name',max_length=32)
 	location = forms.CharField(label='Location', max_length=32)
 	description = forms.CharField(label='Description', max_length=300)	
-	date = forms.CharField(label='Time',max_length=300)
-	feedback = forms.CharField(label='Feedback', max_length=300)
+	date = forms.DateTimeField(label='Date')
+	Calories = forms.IntegerField(label='Calories')
 
 class CreateAccountForm(forms.Form):
-    username = forms.CharField(label='Username', max_length=32)
+    name = forms.CharField(label='Name', max_length=32)
     email = forms.EmailField(label='Email')
     password = forms.CharField(label='Password', max_length=32, widget=forms.PasswordInput)

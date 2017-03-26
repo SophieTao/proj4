@@ -64,9 +64,13 @@ def createAuth(request):
 	else:
 		return JsonResponse("Must Post",safe=False)		
 
-def getAuth(request, pk):
+def getAuth(request, authenticator):
 	if request.method == 'GET':
-		auth = Authenticator.objects.filter(user_id=pk)
+		try:
+			authenticator = Authenticator.objects.filter(pk=authenticator)
+		except ObjectDoesNotExist:
+			return JsonResponse("User has not  been authenticated yet.",safe=False)
+		# auth = Authenticator.objects.filter(user_id=pk)
 		alist = []
 		for i in auth:
 			alist.append(model_to_dict(i))
@@ -83,12 +87,24 @@ def deleteAuth(request,authenticator):
 	authenticator.delete()
 	return JsonResponse("Successfully deleted user authentication",safe=False)
 
-def auth(request,authenticator):
+def auth(request):
 	try:
-		authenticator = Authenticator.objects.get(pk=authenticator)
+		authenticator = Authenticator.objects.get(pk=request.POST['authenticator'])
 	except ObjectDoesNotExist:
 		return JsonResponse("Authenticator does not exist.",safe=False)
-	return JsonResponse("This is an authenticated user",safe=False)
+	return JsonResponse( model_to_dict(authenticator),safe=False)
+
+def allAuth(request):
+	auths = Authenticator.objects.all()
+	response = []
+	for auth in auths:
+		response.append(model_to_dict(auth))
+	return JsonResponse(response,safe=False)
+	# try:
+	# 	authenticator = Authenticator.objects.get(pk=request.POST['authenticator'])
+	# except ObjectDoesNotExist:
+	# 	return JsonResponse("Authenticator does not exist.",safe=False)
+	# return JsonResponse( model_to_dict(authenticator),safe=False)
 
 
 

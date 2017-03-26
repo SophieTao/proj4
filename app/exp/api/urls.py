@@ -8,10 +8,12 @@ urlpatterns = [
 		url(r'^comment/(?P<comment_id>[0-9]+)/$', views.comment, name='comment'),
 		url(r'^profile/(?P<profile_id>[0-9]+)/$', views.profile, name='profile'),
 		url(r'^login$', views.login, name='login'),
-		url(r'^logout$', views.logout, name='logout'),
+		url(r'^logout/(?P<authenticator>\w+)$', views.logout, name='logout'),
 		url(r'^create_account$', views.create_account, name='create_account'),
-    #url(r'^auth$', views.getAuthUser, name='auth_user'),
-    url(r'^listing/create$', views.create_listing, name='create_listing'),
+    url(r'^expiredAuth/delete$', views.delete_expired_auth, name='delete_expired_auth'),
+    url(r'^listing/create$', views.create_listing, name='create_listing'),		
+    url(r'^check_auth/(?P<authenticator>\w+)$', views.check_auth, name='check_auth'),
+
 
 ]
   

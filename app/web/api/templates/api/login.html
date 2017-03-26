@@ -1,24 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="page-header">
+  <h1>Login</h1>
+</div>
 {% if next %}
     <form action="/login/?next={{next}}" method="post">
     	<label for="name">Username: </label>
-        <input id="name" type="text" name="name" value="{{ name }}">
+        <input id="name" type="text" name="name" value="{{ name }}"><br>
         <label for="email">Email: </label>
-        <input id="email" type="text" name="email" value="{{ email }}">
+        <input id="email" type="text" name="email" value="{{ email }}"><br>
         <label for="password">Password: </label>
-        <input id="password" type="password" name="password" value="{{ password }}">
+        <input id="password" type="password" name="password" value="{{ password }}"><br>
         <input type="submit" value="OK">
     </form>
 {% else %}
-    <form action="/login/" method="post">
+    <form action="{% url 'login' %}" method="post">
         <label for="name">Username: </label>
-        <input id="name" type="text" name="name" value="{{ name }}">
+        <input id="name" type="text" name="name" value="{{ name }}"><br>
         <label for="email">Email: </label>
-        <input id="email" type="text" name="email" value="{{ email }}">
+        <input id="email" type="text" name="email" value="{{ email }}"><br>
         <label for="password">Password: </label>
-        <input id="password" type="password" name="password" value="{{ password }}">
+        <input id="password" type="password" name="password" value="{{ password }}"><br>
         <input type="submit" value="OK">
+
     </form>
 {% endif %}
 {% endblock %}
+
