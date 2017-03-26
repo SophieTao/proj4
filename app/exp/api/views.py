@@ -177,16 +177,6 @@ def create_auth(request):
 		return JsonResponse("Cannot create authenticator", safe=False)
 	return JsonResponse(resp2, safe=False)
 
-# def requestPost(url, postdata):
-#     post_data = urllib.parse.urlencode(postdata).encode('utf-8')
-#     req = urllib.request.Request('http://models-api:8000/api/v1/' + url, data=post_data, method='POST')
-#     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-#     return json.loads(resp_json)
-
-# def requestGet(url):
-#     req = urllib.request.Request('http://models-api:8000/api/v1/' + url)
-#     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-#     return json.loads(resp_json)
 ########################################
 
 def create_listing(request):
