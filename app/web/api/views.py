@@ -16,8 +16,26 @@ def home(request):
     resp = json.loads(resp_json)  
     # return JsonResponse(resp[0],safe=False)
     context = {'meals': resp[0],'allcomments': resp[1]}
+    #return JsonResponse(context,safe=False)
     # return JsonResponse(context,safe=False)
     return render(request, 'api/index.html', context)
+
+ #    req = urllib.request.Request('http://models-api:8000/api/v1/allcomments')	
+	# resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+	# resp = json.loads(resp_json)
+
+	# req1 = urllib.request.Request('http://models-api:8000/api/v1/recentmeals')
+	# resp_json1 = urllib.request.urlopen(req1).read().decode('utf-8')
+	# resp1 = json.loads(resp_json1)
+
+	# req2 = urllib.request.Request('http://models-api:8000/api/v1/allmeals')
+	# resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
+	# resp2 = json.loads(resp_json2)
+
+	# if len(resp1) < 3:
+	# 	return JsonResponse([resp2, resp],safe=False)
+	# else:
+	# 	return JsonResponse([resp1, resp],safe=False)
 
 def meal(request, cafe_id):
 		req1 = urllib.request.Request('http://exp-api:8000/meal/'+ cafe_id)

@@ -7,7 +7,7 @@
 Meals
     <ul>
     {% for meal in meals %}
-        <li><a href="/meal/{{ meal.id }}/">hello{{ meal.name }}</a></li>
+        <li><a href="/meal/{{ meal.id }}/">{{ meal.name }}</a></li>
         <br>
     {% endfor %}
     </ul>

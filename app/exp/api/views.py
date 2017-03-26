@@ -23,6 +23,7 @@ def home(request):
 	req2 = urllib.request.Request('http://models-api:8000/api/v1/allmeals')
 	resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
 	resp2 = json.loads(resp_json2)
+	
 
 	if len(resp1) < 3:
 		return JsonResponse([resp2, resp],safe=False)
