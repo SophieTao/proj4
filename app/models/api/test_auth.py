@@ -13,13 +13,17 @@ class AuthenticatorTestCase(TestCase):
            #      date_created="2017-03-25T20:44:23.240",
            #  )
            self.test_auth = Profile.objects.create(
-                name = 'test',
+                username = 'test',
                 password='test',
                 email="test@gmail.com",
             )
         def test_invalid_url(self):
             response = self.client.get('/auth/')
-            self.assertEquals(response.status_code, 404)
+            self.assertEquals(response.status_code, 404) 
+
+        def test_valid_all_auth(self):
+            response = self.client.get(reverse('get_all_auth'))
+            self.assertEqual(response.status_code, 200)
 
         # def test_valid_create_auth(self):
 
@@ -41,55 +45,85 @@ class AuthenticatorTestCase(TestCase):
         #     resp_json = (response.content).decode("utf-8")
         #     self.assertEqual(resp_json, '"Comment does not exist."')
         
+#         def test_valid_create_auth(self):
+#             data = {"username": "Dan", "password": "Bob"}
+# #             response = self.client.post(reverse("profile-add"), data)
+# #             resp_json = json.loads((response.content).decode("utf-8"))
+# #             self.assertEquals(resp_json["username"] , "Dan")
+#             data = {"username": "Bob", "password": "Bob"}
+#             response = self.client.post(reverse("create_auth"), data)
+#             # resp_json = json.loads((response.content).decode("utf-8"))
+#             # self.assertTrue(resp_json["authenticator"])
+#             # self.assertTrue(resp_json["date_created"])
+#             # self.assertTrue(resp_json["user_id"])
+#             resp_json = (response.content).decode("utf-8")
+#             self.assertEquals(resp_json, '"User Does Nots Exist"')    
+
         def test_valid_create_auth(self):
-            data = {"name": "test", "password": "test"}
-            response = self.client.post(reverse("create_auth"), data)
-            resp_json = json.loads((response.content).decode("utf-8"))
-            self.assertTrue(resp_json["authenticator"])
-            self.assertTrue(resp_json["date_created"])
-            self.assertTrue(resp_json["user_id"])
-            
+            data = {"username": "Dan", "password": "Dan", "email": "Dan@gmail.com"}
+            response = self.client.post(reverse("create_auth"), data)            
+            resp_json = (response.content).decode("utf-8")
+            self.assertEquals(resp_json, '"User Does Not Exist"')    
+            response = self.client.post(reverse("profile-add"), data)
+            response2 = self.client.post(reverse("create_auth"), data)            
+            resp_json2 = json.loads((response2.content).decode("utf-8"))
+            self.assertTrue(resp_json2["authenticator"])
+            self.assertTrue(resp_json2["date_created"])
+            self.assertTrue(resp_json2["user_id"])
+
         def test_invalid_create_auth_pw(self):
-            wrongdata = {"name": "test", "password": "t"}
+            data = {"username": "Dan", "password": "Dan", "email": "Dan@gmail.com"}
+            response = self.client.post(reverse("profile-add"), data)
+            response2 = self.client.post(reverse("create_auth"), data) 
+            wrongdata = {"username": "Dan", "password": "Dan1", "email": "Dan@gmail.com"}
             response = self.client.post(reverse('create_auth'), wrongdata)
             resp_json = (response.content).decode("utf-8")
             self.assertEquals(resp_json, '"Incorrect password"')
 
         def test_invalid_create_auth_name(self):
-            wrongdata = {"name": "test", "password": "t"}
+            data = {"username": "Dan", "password": "Dan", "email": "Dan@gmail.com"}
+            response = self.client.post(reverse("profile-add"), data)
+            response2 = self.client.post(reverse("create_auth"), data) 
+            wrongdata = {"username": "Dan1", "password": "Dan", "email": "Dan@gmail.com"}
             response = self.client.post(reverse('create_auth'), wrongdata)
             resp_json = (response.content).decode("utf-8")
-            self.assertEquals(resp_json, '"User Does Not Exist"')    
+            self.assertEquals(resp_json, '"User Does Not Exist"')
         
         def test_invalid_check_auth(self):
-            data = {"name": "test", "password": "test"}
-            response = self.client.post(reverse('create_auth'), data)
-            resp_json = (response.content).decode("utf-8")
-            auth = resp_json["authenticator"]
-            response = self.client.post(reverse('auth'), auth)
-            self.assertEquals(resp_json, '"This is an authenticated user"')
+            data = {"username": "Dan", "password": "Dan", "email": "Dan@gmail.com"}
+            response = self.client.post(reverse("profile-add"), data)
+            response2 = self.client.post(reverse("create_auth"), data)
+            wrongdata = {"username": "Dan1", "password": "Dan", "email": "Dan@gmail.com"}
+            response3 = self.client.post(reverse("check_auth"), wrongdata)
+            resp_json = (response3.content).decode("utf-8")
+            self.assertEquals(resp_json, '"Authenticator does not exist."')
 
         def test_valid_check_auth(self):
-            data = {"name": "test", "password": "test"}
-            response = self.client.post(reverse('create_auth'), data)
-            resp_json = (response.content).decode("utf-8")
-            auth = resp_json["authenticator"]
-            response = self.client.post(reverse('auth'), auth)
-            self.assertEquals(resp_json, '"This is an authenticated user"')
+            data = {"username": "Dan", "password": "Dan", "email": "Dan@gmail.com"}
+            response = self.client.post(reverse("profile-add"), data)
+            response2 = self.client.post(reverse("create_auth"), data)
+            response3 = self.client.post(reverse("check_auth"), data)
+            resp_json = json.loads((response3.content).decode("utf-8"))
+            self.assertTrue(resp_json["authenticator"])
+            self.assertTrue(resp_json["date_created"])
+            self.assertTrue(resp_json["user_id"])
 
         def test_delete_auth(self):
-            data = {"name": "test", "password": "test"}
-            response = self.client.post(reverse('create_auth'), data)
-            resp_json = (response.content).decode("utf-8")
-            auth = resp_json["authenticator"]
-            response = self.client.post(reverse('delete_auth'), auth)
-            self.assertEquals(resp_json, '"Successfully deleted user authentication"')
-            response = self.client.post(reverse('delete_auth'), auth)
-            self.assertEquals(resp_json, '"User has not been authenticated yet."')
+            data = {"username": "Dan", "password": "Dan", "email": "Dan@gmail.com"}
+            response = self.client.post(reverse("profile-add"), data)
+            response2 = self.client.post(reverse("create_auth"), data)
+            resp_json2 = json.loads((response2.content).decode("utf-8"))
+            # response = self.client.post(reverse('create_auth'), data)
+            # resp_json = json.loads((response.content).decode("utf-8"))
+            # auth = resp_json["authenticator"]
+            response3 = self.client.post(reverse('delete_auth'), resp_json2["authenticator"])
+            resp_json3 = (response3.content).decode("utf-8")
+            self.assertEquals(resp_json3, '"Successfully deleted user authentication"')
+            response4 = self.client.post(reverse('delete_auth'), resp_json["authenticator"])     
+            resp_json4 = (response4.content).decode("utf-8")
+            self.assertEquals(resp_json4, '"User has not been authenticated yet."')
 
-
-
-        # def test_invalid_create_comment3(self):
+     # def test_invalid_create_comment3(self):
         #     wrongdata = {"date_written": "2017-02-14 21:19:07.831174","description": "I like today's lunch", "feedback": "thanks"}
         #     response = self.client.post(reverse('comment-add'), wrongdata)
         #     resp_json = (response.content).decode("utf-8")

@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^auth/create$', views.createAuth, name="create_auth"),
     url(r'^auth/delete/(?P<authenticator>\w+)$', views.deleteAuth, name="delete_auth"),
     url(r'^auth/check$', views.checkAuth, name="check_auth"),
-    url(r'^auth/get/(?P<authenticator>\w+)$', views.getAuth, name="get_auth"),
+    # url(r'^auth/get/(?P<authenticator>\w+)$', views.getAuth, name="get_auth"),
     url(r'^auths$', views.authView, name="get_all_auth"),
 
 
