@@ -68,6 +68,7 @@ def logout(request,authenticator):
 	# 	post_encoded = urllib.parse.urlencode(post).encode('utf-8')
 	try:
 		req = urllib.request.Request('http://models-api:8000/api/v1/auth/delete/' + str(authenticator))
+
 	except ObjectDoesNotExist:
 		return JsonResponse("User not found", safe=False)	
 	resp_json = urllib.request.urlopen(req).read().decode('utf-8') 
@@ -190,11 +191,12 @@ def requestGet(url):
 
 def create_listing(request):
 	if request.method == "POST":
-		post = (request.POST).dict()
-		req = urllib.request.Request('http://models-api:8000/api/v1/auth/' + str(post["authenticator"]))
+		post = request.POST.dict()
+		data = urllib.parse.urlencode(post).encode('utf-8')
+		req = urllib.request.Request('http://models-api:8000/api/v1/auth/check',data["authenticator"])
 		resp = urllib.request.urlopen(req).read().decode('utf-8')
 		#return JsonResponse(str(post["authenticator"]), safe=False)
-		if resp != "\"This is an authenticated user\"":
+		if resp == "Authenticator does not exist.":
 			return JsonResponse("Only authenticated users can create new listings.", safe=False)
 		
 		data = urllib.parse.urlencode(post).encode('utf-8')

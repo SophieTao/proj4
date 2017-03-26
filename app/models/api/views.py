@@ -39,7 +39,7 @@ Check password, create/delete/get authenticator
 def createAuth(request):
 	if request.method == 'POST':
 		try:
-			u = Profile.objects.get(name = request.POST['name'])
+			u = Profile.objects.get(username = request.POST['username'])
 		except Profile.DoesNotExist:
 			return JsonResponse("User Does Not Exist",safe=False)
 		if not hashers.check_password(request.POST["password"], u.password):
@@ -89,16 +89,31 @@ def deleteAuth(request,authenticator):
 
 def checkAuth(request):
 	try:
-		u = Profile.objects.get(name = request.POST['name'])
-	except Profile.DoesNotExist:
-		return JsonResponse("User Does Not Exist",safe=False)
-	if not hashers.check_password(request.POST["password"], u.password):
-		return JsonResponse("Incorrect password", safe=False)	
-	try: 
-		user = Authenticator.objects.get(user_id=u.pk)
-	except Authenticator.DoesNotExist:
+		user = Profile.objects.get(username = request.POST['username'])
+	except ObjectDoesNotExist:
 		return JsonResponse("Authenticator does not exist.",safe=False)
-	return JsonResponse( model_to_dict(user),safe=False)
+	except KeyError:
+		try: 
+			u = Authenticator.objects.get(pk = request.POST['authenticator'])
+		except ObjectDoesNotExist:
+			return JsonResponse("Authenticator does not exist.",safe=False)
+		return JsonResponse( model_to_dict(user),safe=False)
+	try:
+		u = Authenticator.objects.get(user_id=user.pk)
+	except ObjectDoesNotExist:
+		return JsonResponse("Authenticator does not exist.",safe=False)
+	except KeyError:
+		return JsonResponse("Authenticator Does Not Exist",safe=False)
+	try:
+		pw = request.POST["password"];
+	except KeyError:
+		return JsonResponse("Incorrect password", safe=False)	
+	if not hashers.check_password(request.POST["password"], user.password):
+		return JsonResponse("Incorrect password", safe=False)	
+	else:
+		return JsonResponse( model_to_dict(u),safe=False)
+
+
 
 def authView(request):
 	auths = Authenticator.objects.all()
@@ -250,13 +265,13 @@ def create_profile(request):
 	if request.method == 'POST':
 		user = Profile()
 		try:
-			u = Profile.objects.get(name=request.POST['name'])
+			u = Profile.objects.get(username=request.POST['username'])
 		except ObjectDoesNotExist:
 			try:
-				v = Profile.objects.get(name=request.POST['email'])
+				v = Profile.objects.get(username=request.POST['email'])
 			except ObjectDoesNotExist:
 				try:
-					user.name = request.POST['name']
+					user.username = request.POST['username']
 					user.email = request.POST['email']
 					user.password = hashers.make_password(request.POST['password'])
 				except KeyError:
@@ -287,7 +302,7 @@ def delete_profile(request, pk):
 def retrieve_profile(request):
 	if request.method == 'POST':
 		try:
-			profile = Profile.objects.get(name=request.POST['name'])
+			profile = Profile.objects.get(username=request.POST['username'])
 			p = [model_to_dict(profile)];
 			#return JsonResponse(model_to_dict(profile))
 		except ObjectDoesNotExist:
@@ -391,7 +406,7 @@ class ProfileRetrieveUpdate(View):
 		result = {}
 		try:
 			profile = Profile.objects.get(pk=pk)
-			profile_fields = [p_field.name for p_field in Profile._meta.get_fields()]
+			profile_fields = [p_field.username for p_field in Profile._meta.get_fields()]
 			for field in profile_fields:
 				if field in request.POST:
 					setattr(profile, field, request.POST[field])

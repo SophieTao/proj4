@@ -3,12 +3,12 @@ from django.core.urlresolvers import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Profile(models.Model):
-	name = models.CharField(max_length=100, unique=True)
+	username = models.CharField(max_length=100, unique=True)
 	email = models.CharField(max_length=100, unique=True, null=True)
 	password = models.CharField(max_length=100, null=True)
 
 	def __str__(self):
-		return self.name
+		return self.username
 
 class Authenticator(models.Model):
 	user_id = models.PositiveIntegerField(null=True)

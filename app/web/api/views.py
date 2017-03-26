@@ -42,7 +42,7 @@ def login(request):
 	if request.method == 'POST':
 		form = LoginForm(request.POST)
 		if not form.is_valid():
-			return JsonResponse("resp",safe=False)	
+			return JsonResponse("invalid input",safe=False)	
 		n = form.cleaned_data.get('next') or reverse('home')
 		post = urllib.parse.urlencode(form.cleaned_data).encode('utf-8')
 		req = urllib.request.Request('http://exp-api:8000/login', post)
@@ -58,8 +58,6 @@ def login(request):
 			req3 = urllib.request.Request('http://exp-api:8000/auth/check',post)
 			resp3 = json.loads(urllib.request.urlopen(req3).read().decode('utf-8'))
 		#return JsonResponse("Authenticate failed.", safe=False)
-		return JsonResponse(resp)	
-
 		authenticator = resp['authenticator']
 		#return JsonResponse(resp['authenticator'], safe=False);
 		response = HttpResponseRedirect(n)
@@ -69,6 +67,7 @@ def login(request):
 
 def logout(request):
     auth = request.COOKIES.get('authenticator')
+    # return JsonResponse(auth, safe=False);
     #post = urllib.parse.urlencode({"authenticator": auth}).encode('utf-8')
     req = urllib.request.Request('http://exp-api:8000/logout/'+str(auth))
     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
@@ -130,10 +129,10 @@ def create_account(request):
 		# return JsonResponse("invalid form",safe=False)
 		# messages.error(request, "Error")
 		return render(request, 'api/create_account.html', {'form': form})
-	username = form.cleaned_data['name']
+	username = form.cleaned_data['username']
 	email = form.cleaned_data['email']
 	password = form.cleaned_data['password']
-	post_data = {'name': username,
+	post_data = {'username': username,
 				 'email': email,
 				 'password': password,}
 	post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
