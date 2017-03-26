@@ -87,14 +87,20 @@ def deleteAuth(request,authenticator):
 	authenticator.delete()
 	return JsonResponse("Successfully deleted user authentication",safe=False)
 
-def auth(request):
+def checkAuth(request):
 	try:
-		authenticator = Authenticator.objects.get(pk=request.POST['authenticator'])
-	except ObjectDoesNotExist:
+		u = Profile.objects.get(name = request.POST['name'])
+	except Profile.DoesNotExist:
+		return JsonResponse("User Does Not Exist",safe=False)
+	if not hashers.check_password(request.POST["password"], u.password):
+		return JsonResponse("Incorrect password", safe=False)	
+	try: 
+		user = Authenticator.objects.get(user_id=u.pk)
+	except Authenticator.DoesNotExist:
 		return JsonResponse("Authenticator does not exist.",safe=False)
-	return JsonResponse( model_to_dict(authenticator),safe=False)
+	return JsonResponse( model_to_dict(user),safe=False)
 
-def allAuth(request):
+def authView(request):
 	auths = Authenticator.objects.all()
 	response = []
 	for auth in auths:

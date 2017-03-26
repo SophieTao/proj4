@@ -14,7 +14,9 @@ def home(request):
     req = urllib.request.Request('http://exp-api:8000/home/')
     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
     resp = json.loads(resp_json)  
+    # return JsonResponse(resp[0],safe=False)
     context = {'meals': resp[0],'allcomments': resp[1]}
+    # return JsonResponse(context,safe=False)
     return render(request, 'api/index.html', context)
 
 def meal(request, cafe_id):
@@ -31,8 +33,6 @@ def comment(request, comment_id):
 		context1 = {'resp': resp1}
 		return render(request, 'api/comment.html', context1)
 
-
-
 def login(request):
 	if request.method == 'GET':
 		n = request.GET.get('next') or reverse('home')
@@ -48,6 +48,18 @@ def login(request):
 		req = urllib.request.Request('http://exp-api:8000/login', post)
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 		resp = json.loads(resp_json)
+		# return JsonResponse(resp==, safe=False);
+		if resp == "User Does Not Exist":
+			response = HttpResponseRedirect(reverse('login'))
+			return response    
+		req2 = urllib.request.Request('http://exp-api:8000/auth/check',post)
+		resp2 = json.loads(urllib.request.urlopen(req2).read().decode('utf-8'))
+		if resp2 == "Authenticator does not exist.":
+			req3 = urllib.request.Request('http://exp-api:8000/auth/check',post)
+			resp3 = json.loads(urllib.request.urlopen(req3).read().decode('utf-8'))
+		#return JsonResponse("Authenticate failed.", safe=False)
+		return JsonResponse(resp)	
+
 		authenticator = resp['authenticator']
 		#return JsonResponse(resp['authenticator'], safe=False);
 		response = HttpResponseRedirect(n)

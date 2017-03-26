@@ -12,7 +12,8 @@ urlpatterns = [
 		url(r'^create_account$', views.create_account, name='create_account'),
     url(r'^expiredAuth/delete$', views.delete_expired_auth, name='delete_expired_auth'),
     url(r'^listing/create$', views.create_listing, name='create_listing'),		
-    url(r'^check_auth/(?P<authenticator>\w+)$', views.check_auth, name='check_auth'),
+    url(r'^auth/check$', views.check_auth, name='check_auth'),
+    url(r'^auth/create$', views.create_auth, name='create_auth'),
 
 
 ]

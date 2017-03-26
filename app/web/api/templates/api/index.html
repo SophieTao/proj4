@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
 {% block body %}
+<div class="page-header">
+ <h1>Meals</h1>
+</div>
 {% if meals %}
 Meals
     <ul>
     {% for meal in meals %}
-        <li><a href="/meal/{{ meal.id }}/">{{ meal.name }}</a></li>
+        <li><a href="/meal/{{ meal.id }}/">hello{{ meal.name }}</a></li>
         <br>
     {% endfor %}
     </ul>
@@ -24,4 +27,5 @@ All Comments
     <p>No comments</p>
 {% endif %}
 {% endblock %}
+
 
