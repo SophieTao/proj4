@@ -103,7 +103,7 @@ def checkAuth(request):
 	except ObjectDoesNotExist:
 		return JsonResponse("Authenticator does not exist.",safe=False)
 	except KeyError:
-		return JsonResponse("Authenticator does not exist",safe=False)
+		return JsonResponse("Authenticator Does Not Exist",safe=False)
 	try:
 		pw = request.POST["password"];
 	except KeyError:
@@ -264,22 +264,23 @@ def profileView(request):
 def create_profile(request):
 	if request.method == 'POST':
 		user = Profile()
-		try:
-			u = Profile.objects.get(username=request.POST['username'])
-		except ObjectDoesNotExist:
+		user.username = request.POST['username']
+		user.email = request.POST['email']
+		pw =request.POST['password']
+		user.password = hashers.make_password(request.POST['password'])
+		if user.username =="" or user.email =="" or pw =="":
+			return JsonResponse("Input did not contain all the required fields.",safe=False)
+		else:
 			try:
-				v = Profile.objects.get(username=request.POST['email'])
+				u = Profile.objects.get(username=request.POST['username'])
 			except ObjectDoesNotExist:
 				try:
-					user.username = request.POST['username']
-					user.email = request.POST['email']
-					user.password = hashers.make_password(request.POST['password'])
-				except KeyError:
-					return JsonResponse("Input did not contain all the required fields.",safe=False)
-				user.save()
-				return JsonResponse(model_to_dict(user))
+					v = Profile.objects.get(email=request.POST['email'])
+				except ObjectDoesNotExist:
+					user.save()
+					return JsonResponse(model_to_dict(user))
+				return JsonResponse("unique",safe=False)
 			return JsonResponse("unique",safe=False)
-		return JsonResponse("unique2",safe=False)
 	else:
 		return JsonResponse("Must Post",safe=False)
 
@@ -292,7 +293,7 @@ def delete_profile(request, pk):
 			profile = Profile.objects.get(pk=pk)
 			profile.delete()
 		except ObjectDoesNotExist:
-			profilefound = False
+			profilefound = Fals
 			return JsonResponse("This profile does not exist.",safe=False)
 		if profilefound:
 			return JsonResponse("Deleted profile ", safe=False)
@@ -329,7 +330,6 @@ def check_dup(request):
 		return JsonResponse("Duplicate username",safe=False)
 	else:
 		return JsonResponse("Must Post", safe=False)
-
 
 def get_recent_meals(request):
     if request.method == 'GET':

@@ -88,21 +88,25 @@ def create_account(request):
 	if request.method == "POST":
 		post = request.POST.dict()
 		data = urllib.parse.urlencode(post).encode('utf-8')
+		req0 = urllib.request.Request('http://models-api:8000/api/v1/profiles/check', data=data)
+		resp_json0 = urllib.request.urlopen(req0).read().decode('utf-8')
+		resp0 = json.loads(resp_json0)
+		if resp0 == "Duplicate username" or resp0 == "Duplicate email":
+			return JsonResponse(resp0,safe=False)
 		req = urllib.request.Request('http://models-api:8000/api/v1/profiles/create', data)
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-		try:
-			resp = json.loads(resp_json)
-		except ObjectDoesNotExist:
-			return JsonResponse("Cannot create profile", safe=False)
-		auth = urllib.parse.urlencode(post).encode('utf-8')
-		req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', auth)
+		resp = json.loads(resp_json)
+		if resp == "Input did not contain all the required fields." or resp == "unique":
+			return JsonResponse(resp, safe=False)
+		else:
+			auth = urllib.parse.urlencode(post).encode('utf-8')
+			req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', auth)
 		try:
 			resp2 = json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
 		except ObjectDoesNotExist:
 			return JsonResponse("Cannot create authenticator", safe=False)
 		return JsonResponse(resp2, safe=False)
-	else:
-		return JsonResponse("Must Post", safe=False)
+
 
 def delete_expired_auth(request):
     # post = request.POST.dict()

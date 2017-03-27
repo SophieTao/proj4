@@ -14,28 +14,8 @@ def home(request):
     req = urllib.request.Request('http://exp-api:8000/home/')
     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
     resp = json.loads(resp_json)  
-    # return JsonResponse(resp[0],safe=False)
     context = {'meals': resp[0],'allcomments': resp[1]}
-    #return JsonResponse(context,safe=False)
-    # return JsonResponse(context,safe=False)
     return render(request, 'api/index.html', context)
-
- #    req = urllib.request.Request('http://models-api:8000/api/v1/allcomments')	
-	# resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-	# resp = json.loads(resp_json)
-
-	# req1 = urllib.request.Request('http://models-api:8000/api/v1/recentmeals')
-	# resp_json1 = urllib.request.urlopen(req1).read().decode('utf-8')
-	# resp1 = json.loads(resp_json1)
-
-	# req2 = urllib.request.Request('http://models-api:8000/api/v1/allmeals')
-	# resp_json2 = urllib.request.urlopen(req2).read().decode('utf-8')
-	# resp2 = json.loads(resp_json2)
-
-	# if len(resp1) < 3:
-	# 	return JsonResponse([resp2, resp],safe=False)
-	# else:
-	# 	return JsonResponse([resp1, resp],safe=False)
 
 def meal(request, cafe_id):
 		req1 = urllib.request.Request('http://exp-api:8000/meal/'+ cafe_id)
@@ -56,7 +36,6 @@ def login(request):
 	msg = False
 	if request.method == 'GET':
 		form = LoginForm()
-		#return JsonResponse("get",safe=False)	
 		return render(request, 'api/login.html', {'form': form, 'next': n})
 	if request.method == 'POST':
 		form = LoginForm(request.POST)
@@ -67,7 +46,6 @@ def login(request):
 		req = urllib.request.Request('http://exp-api:8000/login', post)
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 		resp = json.loads(resp_json)
-		# return JsonResponse(resp==, safe=False);
 		if resp == "User Does Not Exist" or resp == "Incorrect password":
 			msg = "Incorrect username/password"
 			return render(request, 'api/login.html', {'form': form, 'msg': msg})
@@ -79,20 +57,12 @@ def login(request):
 			authenticator = resp3['authenticator']
 		else:
 			authenticator = resp['authenticator']
-		#return JsonResponse("Authenticate failed.", safe=False)
-		#return JsonResponse(resp['authenticator'], safe=False);
 		response = HttpResponseRedirect(n)
-		# response.delete_cookie("authenticator")
 		response.set_cookie("authenticator", authenticator)
 		return response
 
 def logout(request):
     auth = request.COOKIES.get('authenticator')
-    # if not auth:
-    # 	msg = "You can't logout without logging in"
-    # 	return render(request, 'api/login.html', {'msg': msg})
-    # return JsonResponse(auth, safe=False);
-    #post = urllib.parse.urlencode({"authenticator": auth}).encode('utf-8')
     req = urllib.request.Request('http://exp-api:8000/logout/'+str(auth))
     resp_json = urllib.request.urlopen(req).read().decode('utf-8')
     resp = json.loads(resp_json)
@@ -105,19 +75,11 @@ def create_listing(request):
 
 	if not auth:
 		return HttpResponseRedirect(reverse("login") + "?next=" + reverse('create_listing'))
-		#return HttpResponseRedirect(reverse("login") + "?next=" + 'create_listing')
-
 	if request.method == 'POST':
 		form = CreateListingForm(request.POST)
 		if form.is_valid():
-			#return JsonResponse(request.POST.dict(), safe=False)
-			#data = {"authenticator": auth};
 			data = request.POST.dict()
 			data['authenticator'] = auth
-			#c = {x: data.get(x, 0) + jsondata.get(x, 0) for x in set(data).union(jsondata)}
-			#c = {**data, **jsondata}
-			#c.update(data)
-
 			post = urllib.parse.urlencode(data).encode('utf-8')
 			try:
 				req = urllib.request.Request('http://exp-api:8000/listing/create', data=post, method='POST')
@@ -125,14 +87,6 @@ def create_listing(request):
 				return JsonResponse("Fail to create a new listing", safe=False)
 			resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 			resp = json.loads(resp_json)
-			#return JsonResponse(resp, safe=False)
-			# if not resp[0]:
-			# 	return JsonResponse("error0", safe=False)
-			# 	errors = resp[1]
-			# 	if resp[1] == "ERROR: Invalid Auth":
-			# 		return JsonResponse("error3", safe=False)
-			# 		return HttpResponseRedirect(reverse("login") + "?next=" + reverse("create_listing"))
-			# else:
 			return HttpResponseRedirect(reverse('home'))
 		else:
 			return JsonResponse("Invalid input", safe=False)
@@ -143,10 +97,6 @@ def create_listing(request):
 
 
 def create_account(request):
-	# auth = request.COOKIES.get("authenticator")
-	# return JsonResponse(auth, safe=False)
-	# if auth:
-	# 	return HttpResponseRedirect(reverse('home'))
 	msg = False
 	if request.method == 'GET':
 		form = CreateAccountForm()
@@ -154,9 +104,6 @@ def create_account(request):
 	form = CreateAccountForm(request.POST)
 	if not form.is_valid():
 		msg = "Invalid input"
-
-		# return JsonResponse("invalid form",safe=False)
-		# messages.error(request, "Error")
 		return render(request, 'api/create_account.html', {'form': form, 'msg': msg})
 	username = form.cleaned_data['username']
 	email = form.cleaned_data['email']
@@ -165,35 +112,13 @@ def create_account(request):
 				 'email': email,
 				 'password': password,}
 	post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
-	req0 = urllib.request.Request('http://exp-api:8000/profile/check', data=post_encoded)
-	resp_json0 = urllib.request.urlopen(req0).read().decode('utf-8')
-	resp0 = json.loads(resp_json0)
-	if resp0 == "Duplicate username" or resp0 == "Duplicate email":
-		msg = resp0
+	req = urllib.request.Request('http://exp-api:8000/create_account', data=post_encoded)
+	resp = json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
+	if resp == "Duplicate username" or resp == "Duplicate email":
+		msg = resp
 		return render(request, 'api/create_account.html', {'form': form, 'msg': msg})
 	else:
-		try:
-			req = urllib.request.Request('http://exp-api:8000/create_account', data=post_encoded)
-		except ObjectDoesNotExist:
-			msg = "Change your username & Try again"
-			return render(request, 'api/create_account.html', {'form': form, 'msg': msg})
-		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-		resp = json.loads(resp_json)
 		msg = "Successfully created an account"
-		# return JsonResponse(resp,safe=False)		
-		#post_data = {'name': username,'email': email, 'password': password}
-		#post_encoded = urllib.parse.urlencode(post_data).encode('utf-8')
-		# try:
-		# 	req2 = urllib.request.Request('http://exp-api:8000/login/', data=post_encoded, method='POST')
-		# except ObjectDoesNotExist:
-		# 	return JsonResponse("Created a new account but failed to login", safe=False)
-		# 	return render(request, 'api/login.html', {'form': form})
-		return HttpResponseRedirect(reverse("login"))
-	# resp_json = urllib.request.urlopen(req2).read().decode('utf-8')
-	# resp = json.loads(resp_json)
-	# authenticator = resp['result']['authenticator']
-	# response = HttpResponseRedirect(reverse('index'))
-	# response.set_cookie("auth", authenticator["authenticator"])
-	# return response
+		return render(request, 'api/create_account.html', {'form': form, 'msg': msg})
 
 	
