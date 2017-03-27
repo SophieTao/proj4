@@ -293,7 +293,7 @@ def delete_profile(request, pk):
 			profile = Profile.objects.get(pk=pk)
 			profile.delete()
 		except ObjectDoesNotExist:
-			profilefound = Fals
+			profilefound = False
 			return JsonResponse("This profile does not exist.",safe=False)
 		if profilefound:
 			return JsonResponse("Deleted profile ", safe=False)

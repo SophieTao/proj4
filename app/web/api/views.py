@@ -89,7 +89,8 @@ def create_listing(request):
 			resp = json.loads(resp_json)
 			return HttpResponseRedirect(reverse('home'))
 		else:
-			return JsonResponse("Invalid input", safe=False)
+			msg="Invalid input"
+			return render(request, 'api/create_listing.html', {'form': form,'msg':msg})
 	else:
 		form = CreateListingForm()
 	return render(request, 'api/create_listing.html', {'form': form})

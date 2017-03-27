@@ -49,18 +49,18 @@
             </li>
             <li class="">
                 <a href="{% url 'login' %}">
-                    <span class="glyphicon-log-in" aria-hidden="true"></span>&nbsp; Login
+                    <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp; Login
                 </a>
             </li>
         </ul>
     </div>
 </nav>
-  <h1>Signup</h1>
+ <h1>Signup</h1>
 </div>
 {%if msg %}
 <h3>{{msg}}</h3>
 {% endif %}
-<form action="{% url 'create_account' %}" method="post">
+   <form action="{% url 'create_account' %}" method="post">
     <label for="username">Username: </label>
     <input id="username" type="text" name="username" value="{{ username }}"><br>
     <label for="email">Email: </label>
@@ -71,5 +71,4 @@
 </form>
 </body>
 </html>
-
 
