@@ -42,11 +42,11 @@ def comment(request, comment_id):
 	resp = json.loads(resp_json)
 	return JsonResponse(resp, safe=False)
 	
-def profile(request, profile_id):
-	req = urllib.request.Request('http://models-api:8000/api/v1/profiles/' + profile_id)
-	resp_json = urllib.request.urlopen(req).read().decode('utf-8')
-	resp = json.loads(resp_json)
-	return JsonResponse([resp], safe=False)
+# def profile(request, profile_id):
+# 	req = urllib.request.Request('http://models-api:8000/api/v1/profiles/' + profile_id)
+# 	resp_json = urllib.request.urlopen(req).read().decode('utf-8')
+# 	resp = json.loads(resp_json)
+# 	return JsonResponse([resp], safe=False)
 
 ############## user management (login, logout, create account) ###############
 def login(request):

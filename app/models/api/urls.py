@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from . import views
-from .views import CafeRetrieveUpdate, CommentRetrieveUpdate, ProfileRetrieveUpdate
+from .views import CafeRetrieveUpdate, CommentRetrieveUpdate
 
 urlpatterns = [
     url(r'^meals$', views.indexView,name='cafe_list'),
@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'^$', views.profileView, name='home'),
     url(r'^profiles/create$', views.create_profile, name='profile-add'),    
     url(r'^profiles/delete/(?P<pk>\d+)$', views.delete_profile, name='profile-delete'),
-    url(r'^profiles/(?P<pk>[0-9]+)$', ProfileRetrieveUpdate.as_view(), name="retrieve_update_profiles"),
+    # url(r'^profiles/(?P<pk>[0-9]+)$', ProfileRetrieveUpdate.as_view(), name="retrieve_update_profiles"),
     url(r'^profiles/retrieve$', views.retrieve_profile, name='profile-retrieve'),
     url(r'^profiles/check$', views.check_dup, name='check_dup'),
 

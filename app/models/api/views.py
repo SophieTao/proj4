@@ -16,26 +16,6 @@ from .forms import *
 from models import settings
 import datetime
 
-'''
-Check password, create/delete/get authenticator
-'''
-# def check_user_password(request):
-# 	email_addr = request.POST.get('email')
-# 	password = request.POST.get('password')
-# 	found_profile = True
-# 	try:
-# 		user = Profile.objects.get(email=email_addr)
-# 	except ObjectDoesNotExist:
-# 		found_profile = False
-# 	resp = {}
-# 	if (found_profile and hashers.check_password(password, user.password)):
-# 		resp['ok'] = True
-# 		resp['result'] = model_to_dict(user)
-# 	else:
-# 		resp['ok'] = False
-# 		resp['result'] = "Invalid email or password"
-# 	return JsonResponse(resp)
-
 def createAuth(request):
 	if request.method == 'POST':
 		try:
@@ -44,7 +24,6 @@ def createAuth(request):
 			return JsonResponse("User Does Not Exist",safe=False)
 		if not hashers.check_password(request.POST["password"], u.password):
 			return JsonResponse("Incorrect password", safe=False)	
-		#	Check if the newly generated authenticator already exists in the database
 		try: 
 			user = Authenticator.objects.get(user_id=u.pk)
 			deleteAuth(request,user.authenticator)
@@ -56,28 +35,10 @@ def createAuth(request):
 			auth.save()
 			resp=model_to_dict(auth)
 			return JsonResponse(resp)
-			#resp['ok'] = True
-			#resp["result"] = {"authenticator": model_to_dict(auth)}
 		except KeyError:
-			#resp['ok'] = False
 			return JsonResponse("Failed to create authenticator", safe=False)
 	else:
 		return JsonResponse("Must Post",safe=False)		
-
-# def getAuth(request, authenticator):
-# 	if request.method == 'GET':
-# 		try:
-# 			authenticator = Authenticator.objects.filter(pk=authenticator)
-# 		except ObjectDoesNotExist:
-# 			return JsonResponse("User has not  been authenticated yet.",safe=False)
-# 		# auth = Authenticator.objects.filter(user_id=pk)
-# 		alist = []
-# 		for i in auth:
-# 			alist.append(model_to_dict(i))
-# 			return JsonResponse(alist, safe=False)
-# 		return JsonResponse("User does not exist", safe=False)
-# 	else:
-# 		return JsonResponse("Must Get",safe=False)	
 
 def deleteAuth(request,authenticator):
 	try:
@@ -113,21 +74,12 @@ def checkAuth(request):
 	else:
 		return JsonResponse( model_to_dict(u),safe=False)
 
-
-
 def authView(request):
 	auths = Authenticator.objects.all()
 	response = []
 	for auth in auths:
 		response.append(model_to_dict(auth))
 	return JsonResponse(response,safe=False)
-	# try:
-	# 	authenticator = Authenticator.objects.get(pk=request.POST['authenticator'])
-	# except ObjectDoesNotExist:
-	# 	return JsonResponse("Authenticator does not exist.",safe=False)
-	# return JsonResponse( model_to_dict(authenticator),safe=False)
-
-
 
 '''
 Cafe (create, edit, delete, retrieve, IndexView)
@@ -187,11 +139,6 @@ def delete_cafe(request, pk):
 	else:	
 		return JsonResponse("Must Post",safe=False)		
 
-'''
-Comment (create, delete, commentView)
-'''
-
-
 def commentView(request):
 	if request.method == 'GET':
 		result = {}
@@ -242,10 +189,6 @@ def delete_comment(request, pk):
 			return JsonResponse("Deleted comment ", safe=False)
 	else:
 		return JsonResponse("Must Post",safe=False)	
-
-'''
-Profile (create, retrieve, IndexView)
-'''
 
 def profileView(request):
 	if request.method == 'GET':			
@@ -360,9 +303,6 @@ def retrieve_comment_all(request):
 		else:
 				return JsonResponse("Must make GET request.",safe=False)
 
-'''
-Retrieve and Update Cafe, Comment, Profile
-'''
 class CafeRetrieveUpdate(View):
 
 	def get(self, request, pk):
@@ -408,25 +348,25 @@ class CommentRetrieveUpdate(View):
 		except ObjectDoesNotExist:
 			return JsonResponse("Comment does not exist.",safe=False)
 
-class ProfileRetrieveUpdate(View):
-	def get(self, request, pk):
-		try:
-			profile = Profile.objects.get(pk=pk)
-			if hashers.check_password(request.POST['password'], profile.password):
-				return JsonResponse(model_to_dict(profile))			
-		except ObjectDoesNotExist:
-			return JsonResponse("Profile does not exist.",safe=False)
+# class ProfileRetrieveUpdate(View):
+# 	def get(self, request, pk):
+# 		try:
+# 			profile = Profile.objects.get(pk=pk)
+# 			if hashers.check_password(request.POST['password'], profile.password):
+# 				return JsonResponse(model_to_dict(profile))			
+# 		except ObjectDoesNotExist:
+# 			return JsonResponse("Profile does not exist.",safe=False)
 
-	def post(self, request, pk):
-		result = {}
-		try:
-			profile = Profile.objects.get(pk=pk)
-			profile_fields = [p_field.username for p_field in Profile._meta.get_fields()]
-			for field in profile_fields:
-				if field in request.POST:
-					setattr(profile, field, request.POST[field])
-			profile.save()
-			return JsonResponse(model_to_dict(profile))			
-		except ObjectDoesNotExist:
-			return JsonResponse("Profile does not exist.",safe=False)
+# 	def post(self, request, pk):
+# 		result = {}
+# 		try:
+# 			profile = Profile.objects.get(pk=pk)
+# 			profile_fields = [p_field.username for p_field in Profile._meta.get_fields()]
+# 			for field in profile_fields:
+# 				if field in request.POST:
+# 					setattr(profile, field, request.POST[field])
+# 			profile.save()
+# 			return JsonResponse(model_to_dict(profile))			
+# 		except ObjectDoesNotExist:
+# 			return JsonResponse("Profile does not exist.",safe=False)
 
