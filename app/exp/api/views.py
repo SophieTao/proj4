@@ -184,7 +184,7 @@ def create_listing(request):
 	if request.method == "POST":
 		post = request.POST.dict()
 		data = urllib.parse.urlencode(post).encode('utf-8')
-		req = urllib.request.Request('http://models-api:8000/api/v1/auth/check',data["authenticator"])
+		req = urllib.request.Request('http://models-api:8000/api/v1/auth/check',data)
 		resp = urllib.request.urlopen(req).read().decode('utf-8')
 		#return JsonResponse(str(post["authenticator"]), safe=False)
 		if resp == "Authenticator does not exist.":

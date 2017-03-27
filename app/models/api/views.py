@@ -97,7 +97,7 @@ def checkAuth(request):
 			u = Authenticator.objects.get(pk = request.POST['authenticator'])
 		except ObjectDoesNotExist:
 			return JsonResponse("Authenticator does not exist.",safe=False)
-		return JsonResponse( model_to_dict(user),safe=False)
+		return JsonResponse( model_to_dict(u),safe=False)
 	try:
 		u = Authenticator.objects.get(user_id=user.pk)
 	except ObjectDoesNotExist:
