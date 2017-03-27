@@ -103,7 +103,7 @@ def checkAuth(request):
 	except ObjectDoesNotExist:
 		return JsonResponse("Authenticator does not exist.",safe=False)
 	except KeyError:
-		return JsonResponse("Authenticator Does Not Exist",safe=False)
+		return JsonResponse("Authenticator does not exist",safe=False)
 	try:
 		pw = request.POST["password"];
 	except KeyError:
@@ -314,6 +314,21 @@ def retrieve_profile(request):
 		
 	else:
 		return JsonResponse("Must Post",safe=False)
+
+def check_dup(request):
+	if request.method == 'POST':
+		try:
+			profile = Profile.objects.get(username=request.POST['username'])
+			p = [model_to_dict(profile)];
+		except ObjectDoesNotExist:
+			try:
+				profile = Profile.objects.get(email=request.POST['email'])
+			except ObjectDoesNotExist:
+				return JsonResponse("Valid input", safe=False)
+			return JsonResponse("Duplicate email",safe=False)
+		return JsonResponse("Duplicate username",safe=False)
+	else:
+		return JsonResponse("Must Post", safe=False)
 
 
 def get_recent_meals(request):

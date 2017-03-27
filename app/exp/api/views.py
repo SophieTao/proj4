@@ -53,10 +53,9 @@ def login(request):
 	if request.method == "POST":	
 		post = request.POST.dict()
 		data = urllib.parse.urlencode(post).encode('utf-8')
-		try:
-			req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', data)
-		except ObjectDoesNotExist:
-			return JsonResponse("Fail to login", safe=False)	
+		req = urllib.request.Request('http://models-api:8000/api/v1/auth/create', data)
+		# except ObjectDoesNotExist:
+		# 	return JsonResponse("Fail to login", safe=False)	
 		resp_json = urllib.request.urlopen(req).read().decode('utf-8')
 		resp = json.loads(resp_json)
 		return JsonResponse(resp, safe=False)
@@ -116,7 +115,7 @@ def delete_expired_auth(request):
     # return JsonResponse(resp,safe=False)
     for auth in resp:
     	a = auth["authenticator"]
-    	if auth['date_created'] <= (timezone.now() - datetime.timedelta(seconds=1)).isoformat():
+    	if auth['date_created'] <= (timezone.now() - datetime.timedelta(seconds=10)).isoformat():
     		# return JsonResponse("expired",safe=False)
     		# r = urllib.request.Request('http://models-api:8000/api/v1/auth/delete/' + str(a))
     		r1 = urllib.request.Request('http://models-api:8000/api/v1/auth/delete/' + str(a))
@@ -177,6 +176,13 @@ def create_auth(request):
 	except ObjectDoesNotExist:
 		return JsonResponse("Cannot create authenticator", safe=False)
 	return JsonResponse(resp2, safe=False)
+
+def check_dup(request):
+	post = request.POST.dict()
+	data = urllib.parse.urlencode(post).encode('utf-8')
+	req = urllib.request.Request('http://models-api:8000/api/v1/profiles/check',data)
+	resp = json.loads(urllib.request.urlopen(req).read().decode('utf-8'))
+	return JsonResponse(resp,safe=False)	
 
 ########################################
 
